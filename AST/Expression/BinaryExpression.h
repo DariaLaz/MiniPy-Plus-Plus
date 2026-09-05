@@ -44,6 +44,24 @@ public:
 
             return left_value / right_value;
 
+        case TokenType::EqualEqual:
+            return left_value == right_value;
+
+        case TokenType::NotEqual:
+            return left_value != right_value;
+
+        case TokenType::Less:
+            return left_value < right_value;
+
+        case TokenType::LessEqual:
+            return left_value <= right_value;
+
+        case TokenType::Greater:
+            return left_value > right_value;
+
+        case TokenType::GreaterEqual:
+            return left_value >= right_value;
+
         default:
             throw std::runtime_error("Invalid operator");
         }

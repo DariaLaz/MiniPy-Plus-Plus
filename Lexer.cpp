@@ -67,7 +67,35 @@ Token Lexer::tokenize_symbol()
     case ')':
         return {TokenType::RightParen, ")"};
     case '=':
+        if (check_next('='))
+        {
+            curr++;
+            return {TokenType::EqualEqual, "=="};
+        }
         return {TokenType::Equal, "="};
+
+    case '<':
+        if (check_next('='))
+        {
+            curr++;
+            return {TokenType::LessEqual, "<="};
+        }
+        return {TokenType::Less, "<"};
+
+    case '>':
+        if (check_next('='))
+        {
+            curr++;
+            return {TokenType::GreaterEqual, ">="};
+        }
+        return {TokenType::Greater, ">"};
+
+    case '!':
+        if (check_next('='))
+        {
+            curr++;
+            return {TokenType::NotEqual, "!="};
+        }
 
     default:
         throw std::runtime_error(
@@ -97,4 +125,13 @@ bool Lexer::is_identifier() const
 bool Lexer::is_digit() const
 {
     return std::isdigit(static_cast<unsigned char>(source[curr]));
+}
+
+bool Lexer::check_next(char ch) const
+{
+    if (curr == source.size() - 1)
+    {
+        return false;
+    }
+    return source[curr + 1] == ch;
 }

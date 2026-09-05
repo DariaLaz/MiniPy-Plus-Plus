@@ -11,7 +11,14 @@ enum class TokenType
     Star,
     Slash,
 
-    Equal,
+    Equal,      // =
+    EqualEqual, // ==
+    NotEqual,   // !=
+
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
 
     LeftParen,
     RightParen,

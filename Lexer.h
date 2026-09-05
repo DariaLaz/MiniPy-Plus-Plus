@@ -22,4 +22,6 @@ private:
 
     bool is_identifier() const;
     bool is_digit() const;
+
+    bool check_next(char ch) const;
 };

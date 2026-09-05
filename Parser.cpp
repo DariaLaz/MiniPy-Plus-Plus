@@ -30,6 +30,19 @@ bool Parser::check(TokenType type) const
     return current().type == type;
 }
 
+bool Parser::check(std::initializer_list<TokenType> types) const
+{
+    for (TokenType type : types)
+    {
+        if (check(type))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Parser::check_next(TokenType type) const
 {
     if (curr + 1 >= tokens.size())
@@ -78,7 +91,7 @@ std::unique_ptr<Expression> Parser::primary()
 
 std::unique_ptr<Expression> Parser::unary()
 {
-    if (check(TokenType::Minus) || check(TokenType::Plus))
+    if (check({TokenType::Minus, TokenType::Plus}))
     {
         Token t = current();
         curr++;
@@ -92,47 +105,27 @@ std::unique_ptr<Expression> Parser::unary()
 
 std::unique_ptr<Expression> Parser::factor()
 {
-    auto left = unary();
-
-    while (check(TokenType::Slash) || check(TokenType::Slash))
-    {
-        Token t = current();
-        curr++;
-
-        auto right = unary();
-
-        left = std::make_unique<BinaryExpression>(
-            std::move(left),
-            t,
-            std::move(right));
-    }
-
-    return left;
+    return binary_expr(&Parser::unary, {TokenType::Slash, TokenType::Slash});
 }
 
 std::unique_ptr<Expression> Parser::term()
 {
-    auto left = factor();
+    return binary_expr(&Parser::factor, {TokenType::Plus, TokenType::Minus});
+}
 
-    while (check(TokenType::Plus) || check(TokenType::Minus))
-    {
-        Token t = current();
-        curr++;
+std::unique_ptr<Expression> Parser::comparison()
+{
+    return binary_expr(&Parser::term, {TokenType::Less, TokenType::LessEqual, TokenType::Greater, TokenType::GreaterEqual});
+}
 
-        auto right = factor();
-
-        left = std::make_unique<BinaryExpression>(
-            std::move(left),
-            t,
-            std::move(right));
-    }
-
-    return left;
+std::unique_ptr<Expression> Parser::equality()
+{
+    return binary_expr(&Parser::comparison, {TokenType::EqualEqual, TokenType::NotEqual});
 }
 
 std::unique_ptr<Expression> Parser::expression()
 {
-    return term();
+    return equality();
 }
 
 std::unique_ptr<Statement> Parser::statement()
@@ -149,6 +142,28 @@ std::unique_ptr<Statement> Parser::statement()
     }
 
     return std::make_unique<ExpressionStatement>(expression());
+}
+
+std::unique_ptr<Expression> Parser::binary_expr(
+    std::unique_ptr<Expression> (Parser::*expr)(),
+    std::initializer_list<TokenType> types)
+{
+    auto left = (this->*expr)();
+
+    while (check(types))
+    {
+        Token t = current();
+        curr++;
+
+        auto right = (this->*expr)();
+
+        left = std::make_unique<BinaryExpression>(
+            std::move(left),
+            t,
+            std::move(right));
+    }
+
+    return left;
 }
 
 std::unique_ptr<Statement> Parser::parse()

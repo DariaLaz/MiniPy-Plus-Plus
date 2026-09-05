@@ -17,14 +17,21 @@ public:
 private:
     std::unique_ptr<Statement> statement();
     std::unique_ptr<Expression> expression();
+    std::unique_ptr<Expression> equality();
+    std::unique_ptr<Expression> comparison();
     std::unique_ptr<Expression> term();
     std::unique_ptr<Expression> factor();
     std::unique_ptr<Expression> unary();
     std::unique_ptr<Expression> primary();
 
+    std::unique_ptr<Expression> binary_expr(
+        std::unique_ptr<Expression> (Parser::*expr)(),
+        std::initializer_list<TokenType> types);
+
     const Token &current() const;
     const Token &prev() const;
     bool check(TokenType type) const;
+    bool check(std::initializer_list<TokenType> types) const;
     bool check_next(TokenType type) const;
     bool match(TokenType type);
 

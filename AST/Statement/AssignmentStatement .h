@@ -15,7 +15,7 @@ public:
     {
     }
 
-    std::optional<int> execute(Environment &env) const override
+    std::optional<Value> execute(Environment &env) const override
     {
         env.set(name, value->evaluate(env));
 

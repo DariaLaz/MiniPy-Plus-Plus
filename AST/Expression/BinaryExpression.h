@@ -22,45 +22,45 @@ public:
     {
     }
 
-    int evaluate(Environment &env) const override
+    Value evaluate(Environment &env) const override
     {
-        int left_value = left->evaluate(env);
-        int right_value = right->evaluate(env);
+        Value left_value = left->evaluate(env);
+        Value right_value = right->evaluate(env);
 
         switch (op.type)
         {
         case TokenType::Plus:
-            return left_value + right_value;
+            return std::get<int>(left_value) + std::get<int>(right_value);
 
         case TokenType::Minus:
-            return left_value - right_value;
+            return std::get<int>(left_value) - std::get<int>(right_value);
 
         case TokenType::Star:
-            return left_value * right_value;
+            return std::get<int>(left_value) * std::get<int>(right_value);
 
         case TokenType::Slash:
-            if (right_value == 0)
+            if (std::get<int>(right_value) == 0)
                 throw std::runtime_error("Division by zero");
 
-            return left_value / right_value;
+            return std::get<int>(left_value) / std::get<int>(right_value);
 
         case TokenType::EqualEqual:
-            return left_value == right_value;
+            return std::get<int>(left_value) == std::get<int>(right_value);
 
         case TokenType::NotEqual:
-            return left_value != right_value;
+            return std::get<int>(left_value) != std::get<int>(right_value);
 
         case TokenType::Less:
-            return left_value < right_value;
+            return std::get<int>(left_value) < std::get<int>(right_value);
 
         case TokenType::LessEqual:
-            return left_value <= right_value;
+            return std::get<int>(left_value) <= std::get<int>(right_value);
 
         case TokenType::Greater:
-            return left_value > right_value;
+            return std::get<int>(left_value) > std::get<int>(right_value);
 
         case TokenType::GreaterEqual:
-            return left_value >= right_value;
+            return std::get<int>(left_value) >= std::get<int>(right_value);
 
         default:
             throw std::runtime_error("Invalid operator");

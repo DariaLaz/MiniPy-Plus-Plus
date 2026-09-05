@@ -12,7 +12,7 @@ public:
     {
     }
 
-    int evaluate(Environment &env) const override
+    Value evaluate(Environment &env) const override
     {
         return env.get(name);
     }

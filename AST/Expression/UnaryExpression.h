@@ -20,14 +20,14 @@ public:
     {
     }
 
-    int evaluate(Environment &env) const override
+    Value evaluate(Environment &env) const override
     {
-        int value = expr->evaluate(env);
+        Value value = expr->evaluate(env);
 
         switch (op.type)
         {
         case TokenType::Minus:
-            return -value;
+            return -std::get<int>(value);
 
         case TokenType::Plus:
             return value;

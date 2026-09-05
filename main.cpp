@@ -4,6 +4,19 @@
 #include "Lexer.h"
 #include "Parser.h"
 
+void print_value(const Value &value)
+{
+    if (std::holds_alternative<int>(value))
+    {
+        std::cout << std::get<int>(value);
+    }
+    else if (std::holds_alternative<bool>(value))
+    {
+        std::cout
+            << (std::get<bool>(value) ? "True" : "False");
+    }
+}
+
 int main()
 {
     std::string line;
@@ -35,7 +48,8 @@ int main()
 
             if (result.has_value())
             {
-                std::cout << result.value() << '\n';
+                print_value(result.value());
+                std::cout << '\n';
             }
         }
         catch (const std::exception &e)

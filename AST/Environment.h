@@ -4,15 +4,17 @@
 #include <unordered_map>
 #include <stdexcept>
 
+#include "Value.h"
+
 class Environment
 {
 public:
-    void set(const std::string &name, int value)
+    void set(const std::string &name, Value value)
     {
         values[name] = value;
     }
 
-    int get(const std::string &name) const
+    Value get(const std::string &name) const
     {
         auto val = values.find(name);
 
@@ -25,5 +27,5 @@ public:
     }
 
 private:
-    std::unordered_map<std::string, int> values;
+    std::unordered_map<std::string, Value> values;
 };

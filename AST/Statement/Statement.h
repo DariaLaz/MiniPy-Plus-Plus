@@ -9,5 +9,5 @@ class Statement
 public:
     virtual ~Statement() = default;
 
-    virtual std::optional<int> execute(Environment &env) const = 0;
+    virtual std::optional<Value> execute(Environment &env) const = 0;
 };

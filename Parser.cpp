@@ -2,13 +2,15 @@
 #include <string>
 #include <utility>
 
-#include "AST/Expression/NumberExpression.h"
 #include "AST/Expression/BinaryExpression.h"
-#include "Parser.h"
+#include "AST/Expression/BoolExpression.h"
+#include "AST/Expression/NumberExpression.h"
 #include "AST/Expression/UnaryExpression.h"
 #include "AST/Expression/VariableExpression.h"
 #include "AST/Statement/AssignmentStatement .h"
 #include "AST/Statement/ExpressionStatement.h"
+#include "AST/Statement/IfStatement.h"
+#include "Parser.h"
 
 Parser::Parser(const std::vector<Token> &tokens)
     : tokens(tokens)
@@ -86,6 +88,16 @@ std::unique_ptr<Expression> Parser::primary()
         return expr;
     }
 
+    if (match(TokenType::True))
+    {
+        return std::make_unique<BoolExpression>(true);
+    }
+
+    if (match(TokenType::False))
+    {
+        return std::make_unique<BoolExpression>(false);
+    }
+
     throw std::runtime_error("Expected expression");
 }
 
@@ -128,8 +140,46 @@ std::unique_ptr<Expression> Parser::expression()
     return equality();
 }
 
+std::unique_ptr<Statement> Parser::if_statement()
+{
+    auto condition = expression();
+
+    if (!match(TokenType::Colon))
+    {
+        throw std::runtime_error("Expected ':' after 'if' condition");
+    }
+
+    auto then = statement();
+
+    std::unique_ptr<Statement> else_branch = nullptr;
+
+    if (match(TokenType::Elif))
+    {
+        else_branch = if_statement();
+    }
+    else if (match(TokenType::Else))
+    {
+        if (!match(TokenType::Colon))
+        {
+            throw std::runtime_error("Expected ':' after else");
+        }
+
+        else_branch = statement();
+    }
+
+    return std::make_unique<IfStatement>(
+        std::move(condition),
+        std::move(then),
+        std::move(else_branch));
+}
+
 std::unique_ptr<Statement> Parser::statement()
 {
+    if (match(TokenType::If))
+    {
+        return if_statement();
+    }
+
     if (check(TokenType::Identifier) && check_next(TokenType::Equal))
     {
         std::string name = current().text;

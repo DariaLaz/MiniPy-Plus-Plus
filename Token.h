@@ -22,6 +22,13 @@ enum class TokenType
 
     LeftParen,
     RightParen,
+    Colon,
+
+    If,
+    Elif,
+    Else,
+    True,
+    False,
 
     End
 };

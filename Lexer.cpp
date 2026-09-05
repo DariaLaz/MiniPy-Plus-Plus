@@ -25,7 +25,7 @@ std::vector<Token> Lexer::tokenize()
 
         if (is_identifier())
         {
-            tokens.push_back(tokenize_identifier());
+            tokens.push_back(tokenize_identifier_or_keyword());
             continue;
         }
 
@@ -66,6 +66,8 @@ Token Lexer::tokenize_symbol()
         return {TokenType::LeftParen, "("};
     case ')':
         return {TokenType::RightParen, ")"};
+    case ':':
+        return {TokenType::Colon, ":"};
     case '=':
         if (check_next('='))
         {
@@ -103,7 +105,7 @@ Token Lexer::tokenize_symbol()
     }
 }
 
-Token Lexer::tokenize_identifier()
+Token Lexer::tokenize_identifier_or_keyword()
 {
     std::string identifier;
 
@@ -112,6 +114,21 @@ Token Lexer::tokenize_identifier()
         identifier += source[curr];
         curr++;
     }
+
+    if (identifier == "if")
+        return {TokenType::If, identifier};
+
+    if (identifier == "elif")
+        return {TokenType::Elif, identifier};
+
+    if (identifier == "else")
+        return {TokenType::Else, identifier};
+
+    if (identifier == "True")
+        return {TokenType::True, identifier};
+
+    if (identifier == "False")
+        return {TokenType::False, identifier};
 
     return {TokenType::Identifier, identifier};
 }

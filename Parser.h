@@ -18,6 +18,7 @@ private:
     std::unique_ptr<Statement> block();
     std::unique_ptr<Statement> statement();
     std::unique_ptr<Statement> simple_statement();
+    std::unique_ptr<Statement> while_statement();
     std::unique_ptr<Statement> if_statement();
     std::unique_ptr<Expression> expression();
     std::unique_ptr<Expression> equality();

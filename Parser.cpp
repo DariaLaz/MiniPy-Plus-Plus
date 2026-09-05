@@ -8,10 +8,11 @@
 #include "AST/Expression/UnaryExpression.h"
 #include "AST/Expression/VariableExpression.h"
 #include "AST/Statement/AssignmentStatement .h"
+#include "AST/Statement/BlockStatement.h"
 #include "AST/Statement/ExpressionStatement.h"
 #include "AST/Statement/IfStatement.h"
+#include "AST/Statement/WhileStatement.h"
 #include "Parser.h"
-#include "BlockStatement.h"
 
 Parser::Parser(const std::vector<Token> &tokens)
     : tokens(tokens)
@@ -174,6 +175,20 @@ std::unique_ptr<Statement> Parser::if_statement()
         std::move(else_branch));
 }
 
+std::unique_ptr<Statement> Parser::while_statement()
+{
+    auto condition = expression();
+
+    if (!match(TokenType::Colon))
+    {
+        throw std::runtime_error("Expected ':' after 'while' condition");
+    }
+
+    auto body = block();
+
+    return std::make_unique<WhileStatement>(std::move(condition), std::move(body));
+}
+
 std::unique_ptr<Statement> Parser::simple_statement()
 {
     if (check(TokenType::Identifier) && check_next(TokenType::Equal))
@@ -195,6 +210,11 @@ std::unique_ptr<Statement> Parser::statement()
     if (match(TokenType::If))
     {
         return if_statement();
+    }
+
+    if (match(TokenType::While))
+    {
+        return while_statement();
     }
 
     auto stmt = simple_statement();

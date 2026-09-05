@@ -30,6 +30,8 @@ enum class TokenType
     True,
     False,
 
+    While,
+
     Newline,
     Indent,
     Dedent,

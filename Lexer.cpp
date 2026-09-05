@@ -159,6 +159,9 @@ Token Lexer::tokenize_identifier_or_keyword()
     if (identifier == "False")
         return {TokenType::False, identifier};
 
+    if (identifier == "while")
+        return {TokenType::While, identifier};
+
     return {TokenType::Identifier, identifier};
 }
 

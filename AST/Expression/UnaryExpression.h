@@ -3,7 +3,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "Expression.h"
+#include "AST/Expression/Expression.h"
 #include "Token.h"
 
 class UnaryExpression : public Expression
@@ -20,9 +20,9 @@ public:
     {
     }
 
-    int evaluate() const override
+    int evaluate(Environment &env) const override
     {
-        int value = expr->evaluate();
+        int value = expr->evaluate(env);
 
         switch (op.type)
         {

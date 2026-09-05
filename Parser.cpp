@@ -2,10 +2,13 @@
 #include <string>
 #include <utility>
 
-#include "NumberExpression.h"
-#include "BinaryExpression.h"
+#include "AST/Expression/NumberExpression.h"
+#include "AST/Expression/BinaryExpression.h"
 #include "Parser.h"
-#include "UnaryExpression.h"
+#include "AST/Expression/UnaryExpression.h"
+#include "AST/Expression/VariableExpression.h"
+#include "AST/Statement/AssignmentStatement .h"
+#include "AST/Statement/ExpressionStatement.h"
 
 Parser::Parser(const std::vector<Token> &tokens)
     : tokens(tokens)
@@ -27,6 +30,14 @@ bool Parser::check(TokenType type) const
     return current().type == type;
 }
 
+bool Parser::check_next(TokenType type) const
+{
+    if (curr + 1 >= tokens.size())
+        return false;
+
+    return tokens[curr + 1].type == type;
+}
+
 bool Parser::match(TokenType type)
 {
     if (!check(type))
@@ -43,6 +54,11 @@ std::unique_ptr<Expression> Parser::primary()
     if (match(TokenType::Number))
     {
         return std::make_unique<NumberExpression>(std::stoi(prev().text));
+    }
+
+    if (match(TokenType::Identifier))
+    {
+        return std::make_unique<VariableExpression>(prev().text);
     }
 
     if (match(TokenType::LeftParen))
@@ -119,9 +135,25 @@ std::unique_ptr<Expression> Parser::expression()
     return term();
 }
 
-std::unique_ptr<Expression> Parser::parse()
+std::unique_ptr<Statement> Parser::statement()
 {
-    auto expr = expression();
+    if (check(TokenType::Identifier) && check_next(TokenType::Equal))
+    {
+        std::string name = current().text;
+
+        curr += 2; // identifier + '='
+
+        auto value = expression();
+
+        return std::make_unique<AssignmentStatement>(name, std::move(value));
+    }
+
+    return std::make_unique<ExpressionStatement>(expression());
+}
+
+std::unique_ptr<Statement> Parser::parse()
+{
+    auto st = statement();
 
     if (!check(TokenType::End))
     {
@@ -129,5 +161,5 @@ std::unique_ptr<Expression> Parser::parse()
             "Unexpected token: " + current().text);
     }
 
-    return expr;
+    return st;
 }

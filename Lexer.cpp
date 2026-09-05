@@ -23,6 +23,12 @@ std::vector<Token> Lexer::tokenize()
             continue;
         }
 
+        if (is_identifier())
+        {
+            tokens.push_back(tokenize_identifier());
+            continue;
+        }
+
         tokens.push_back(tokenize_symbol());
         curr++;
     }
@@ -35,9 +41,7 @@ std::vector<Token> Lexer::tokenize()
 Token Lexer::tokenize_number()
 {
     std::string number = "";
-    while (
-        curr < source.size() &&
-        std::isdigit(static_cast<unsigned char>(source[curr])))
+    while (curr < source.size() && is_digit())
     {
         number += source[curr];
         curr++;
@@ -62,9 +66,35 @@ Token Lexer::tokenize_symbol()
         return {TokenType::LeftParen, "("};
     case ')':
         return {TokenType::RightParen, ")"};
+    case '=':
+        return {TokenType::Equal, "="};
 
     default:
         throw std::runtime_error(
             "Unexpected character: " + std::string(1, source[curr]));
     }
+}
+
+Token Lexer::tokenize_identifier()
+{
+    std::string identifier;
+
+    while (curr < source.size() && is_identifier())
+    {
+        identifier += source[curr];
+        curr++;
+    }
+
+    return {TokenType::Identifier, identifier};
+}
+
+bool Lexer::is_identifier() const
+{
+    return std::isalpha(static_cast<unsigned char>(source[curr])) ||
+           source[curr] == '_';
+}
+
+bool Lexer::is_digit() const
+{
+    return std::isdigit(static_cast<unsigned char>(source[curr]));
 }

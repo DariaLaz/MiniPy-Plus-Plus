@@ -18,4 +18,8 @@ private:
 
     Token tokenize_symbol();
     Token tokenize_number();
+    Token tokenize_identifier();
+
+    bool is_identifier() const;
+    bool is_digit() const;
 };

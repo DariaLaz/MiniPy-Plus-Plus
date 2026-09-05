@@ -1,5 +1,5 @@
 #pragma once
-#include "Expression.h"
+#include "AST/Expression/Expression.h"
 
 class NumberExpression : public Expression
 {
@@ -9,7 +9,7 @@ public:
     NumberExpression(int value)
         : value(value) {}
 
-    int evaluate() const override
+    int evaluate(Environment &env) const override
     {
         return value;
     }

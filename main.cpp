@@ -7,6 +7,7 @@
 int main()
 {
     std::string line;
+    Environment env;
 
     while (true)
     {
@@ -28,9 +29,14 @@ int main()
             std::vector<Token> tokens = lexer.tokenize();
 
             Parser parser(tokens);
-            std::unique_ptr<Expression> expression = parser.parse();
+            auto statement = parser.parse();
 
-            std::cout << expression->evaluate() << '\n';
+            auto result = statement->execute(env);
+
+            if (result.has_value())
+            {
+                std::cout << result.value() << '\n';
+            }
         }
         catch (const std::exception &e)
         {

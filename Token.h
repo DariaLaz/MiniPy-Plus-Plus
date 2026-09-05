@@ -4,12 +4,18 @@
 enum class TokenType
 {
     Number,
+    Identifier,
+
     Plus,
     Minus,
     Star,
     Slash,
+
+    Equal,
+
     LeftParen,
     RightParen,
+
     End
 };
 

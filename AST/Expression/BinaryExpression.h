@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Expression.h"
+#include "AST/Expression/Expression.h"
 #include "Token.h"
 
 class BinaryExpression : public Expression
@@ -22,10 +22,10 @@ public:
     {
     }
 
-    int evaluate() const override
+    int evaluate(Environment &env) const override
     {
-        int left_value = left->evaluate();
-        int right_value = right->evaluate();
+        int left_value = left->evaluate(env);
+        int right_value = right->evaluate(env);
 
         switch (op.type)
         {

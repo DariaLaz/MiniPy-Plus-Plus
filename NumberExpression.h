@@ -4,8 +4,13 @@
 class NumberExpression : public Expression
 {
 public:
+    int value;
+
     NumberExpression(int value)
         : value(value) {}
 
-    int value;
+    int evaluate() const override
+    {
+        return value;
+    }
 };

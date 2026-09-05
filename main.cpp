@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
 
+#include "Lexer.h"
+#include "Parser.h"
+
 int main()
 {
     std::string line;
@@ -8,14 +11,30 @@ int main()
     while (true)
     {
         std::cout << ">>> ";
-        std::getline(std::cin, line);
 
+        if (line.empty())
+        {
+            continue;
+        }
         if (line == "exit")
         {
             break;
         }
 
-        std::cout << line << '\n';
+        try
+        {
+            Lexer lexer(line);
+            std::vector<Token> tokens = lexer.tokenize();
+
+            Parser parser(tokens);
+            std::unique_ptr<Expression> expression = parser.parse();
+
+            std::cout << expression->evaluate() << '\n';
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << "Error: " << e.what() << '\n';
+        }
     }
 
     return 0;

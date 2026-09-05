@@ -9,7 +9,25 @@ std::vector<Token> Lexer::tokenize()
 
     while (curr < source.size())
     {
+        if (line_start)
+        {
+            handle_indentation(tokens);
+
+            if (curr >= source.size())
+            {
+                break;
+            }
+        }
         char curr_char = static_cast<unsigned char>(source[curr]);
+
+        if (curr_char == '\n')
+        {
+            tokens.push_back({TokenType::Newline, "\\n"});
+
+            curr++;
+            line_start = true;
+            continue;
+        }
 
         if (std::isspace(curr_char))
         {
@@ -31,6 +49,17 @@ std::vector<Token> Lexer::tokenize()
 
         tokens.push_back(tokenize_symbol());
         curr++;
+    }
+
+    if (tokens.empty() || tokens.back().type != TokenType::Newline)
+    {
+        tokens.push_back({TokenType::Newline, "\\n"});
+    }
+
+    while (indent_levels.size() > 1)
+    {
+        indent_levels.pop_back();
+        tokens.push_back({TokenType::Dedent, ""});
     }
 
     tokens.push_back({TokenType::End, ""});
@@ -151,4 +180,49 @@ bool Lexer::check_next(char ch) const
         return false;
     }
     return source[curr + 1] == ch;
+}
+
+void Lexer::handle_indentation(std::vector<Token> &tokens)
+{
+    int spaces = 0;
+
+    while (curr < source.size() && source[curr] == ' ')
+    {
+        spaces++;
+        curr++;
+    }
+
+    if (curr < source.size() && source[curr] == '\t')
+    {
+        throw std::runtime_error("Tabs are not supported for indentation");
+    }
+
+    if (curr >= source.size() || source[curr] == '\n')
+    {
+        return;
+    }
+
+    int current_indent = indent_levels.back();
+
+    if (spaces > current_indent)
+    {
+        indent_levels.push_back(spaces);
+
+        tokens.push_back({TokenType::Indent, ""});
+    }
+    else if (spaces < current_indent)
+    {
+        while (indent_levels.size() > 1 && spaces < indent_levels.back())
+        {
+            indent_levels.pop_back();
+            tokens.push_back({TokenType::Dedent, ""});
+        }
+
+        if (spaces != indent_levels.back())
+        {
+            throw std::runtime_error("Inconsistent indentation");
+        }
+    }
+
+    line_start = false;
 }

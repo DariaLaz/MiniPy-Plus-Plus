@@ -30,6 +30,10 @@ enum class TokenType
     True,
     False,
 
+    Newline,
+    Indent,
+    Dedent,
+
     End
 };
 

@@ -11,6 +11,7 @@
 #include "AST/Statement/ExpressionStatement.h"
 #include "AST/Statement/IfStatement.h"
 #include "Parser.h"
+#include "BlockStatement.h"
 
 Parser::Parser(const std::vector<Token> &tokens)
     : tokens(tokens)
@@ -149,7 +150,7 @@ std::unique_ptr<Statement> Parser::if_statement()
         throw std::runtime_error("Expected ':' after 'if' condition");
     }
 
-    auto then = statement();
+    auto then = block();
 
     std::unique_ptr<Statement> else_branch = nullptr;
 
@@ -164,7 +165,7 @@ std::unique_ptr<Statement> Parser::if_statement()
             throw std::runtime_error("Expected ':' after else");
         }
 
-        else_branch = statement();
+        else_branch = block();
     }
 
     return std::make_unique<IfStatement>(
@@ -173,13 +174,8 @@ std::unique_ptr<Statement> Parser::if_statement()
         std::move(else_branch));
 }
 
-std::unique_ptr<Statement> Parser::statement()
+std::unique_ptr<Statement> Parser::simple_statement()
 {
-    if (match(TokenType::If))
-    {
-        return if_statement();
-    }
-
     if (check(TokenType::Identifier) && check_next(TokenType::Equal))
     {
         std::string name = current().text;
@@ -192,6 +188,55 @@ std::unique_ptr<Statement> Parser::statement()
     }
 
     return std::make_unique<ExpressionStatement>(expression());
+}
+
+std::unique_ptr<Statement> Parser::statement()
+{
+    if (match(TokenType::If))
+    {
+        return if_statement();
+    }
+
+    auto stmt = simple_statement();
+
+    if (!match(TokenType::Newline))
+    {
+        throw std::runtime_error("Expected newline after statement");
+    }
+
+    return stmt;
+}
+
+std::unique_ptr<Statement> Parser::block()
+{
+    if (!match(TokenType::Newline))
+    {
+        throw std::runtime_error("Expected newline before block");
+    }
+
+    if (!match(TokenType::Indent))
+    {
+        throw std::runtime_error("Expected indented block");
+    }
+
+    std::vector<std::unique_ptr<Statement>> statements;
+
+    while (!check(TokenType::Dedent) && !check(TokenType::End))
+    {
+        if (match(TokenType::Newline))
+        {
+            continue;
+        }
+
+        statements.push_back(statement());
+    }
+
+    if (!match(TokenType::Dedent))
+    {
+        throw std::runtime_error("Expected dedent after block");
+    }
+
+    return std::make_unique<BlockStatement>(std::move(statements));
 }
 
 std::unique_ptr<Expression> Parser::binary_expr(
@@ -218,13 +263,17 @@ std::unique_ptr<Expression> Parser::binary_expr(
 
 std::unique_ptr<Statement> Parser::parse()
 {
-    auto st = statement();
+    std::vector<std::unique_ptr<Statement>> statements;
 
-    if (!check(TokenType::End))
+    while (!check(TokenType::End))
     {
-        throw std::runtime_error(
-            "Unexpected token: " + current().text);
+        if (match(TokenType::Newline))
+        {
+            continue;
+        }
+
+        statements.push_back(statement());
     }
 
-    return st;
+    return std::make_unique<BlockStatement>(std::move(statements));
 }

@@ -16,6 +16,9 @@ private:
     std::string source;
     int curr = 0;
 
+    std::vector<int> indent_levels = {0};
+    bool line_start = true;
+
     Token tokenize_symbol();
     Token tokenize_number();
     Token tokenize_identifier_or_keyword();
@@ -24,4 +27,6 @@ private:
     bool is_digit() const;
 
     bool check_next(char ch) const;
+
+    void handle_indentation(std::vector<Token> &tokens);
 };

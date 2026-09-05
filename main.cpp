@@ -12,13 +12,14 @@ int main()
     {
         std::cout << ">>> ";
 
+        if (!std::getline(std::cin, line) || line == "exit")
+        {
+            break;
+        }
+
         if (line.empty())
         {
             continue;
-        }
-        if (line == "exit")
-        {
-            break;
         }
 
         try

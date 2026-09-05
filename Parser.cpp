@@ -5,6 +5,7 @@
 #include "NumberExpression.h"
 #include "BinaryExpression.h"
 #include "Parser.h"
+#include "UnaryExpression.h"
 
 Parser::Parser(const std::vector<Token> &tokens)
     : tokens(tokens)
@@ -59,16 +60,30 @@ std::unique_ptr<Expression> Parser::primary()
     throw std::runtime_error("Expected expression");
 }
 
+std::unique_ptr<Expression> Parser::unary()
+{
+    if (check(TokenType::Minus) || check(TokenType::Plus))
+    {
+        Token t = current();
+        curr++;
+
+        auto val = unary();
+        return std::make_unique<UnaryExpression>(t, std::move(val));
+    }
+
+    return primary();
+}
+
 std::unique_ptr<Expression> Parser::factor()
 {
-    auto left = primary();
+    auto left = unary();
 
     while (check(TokenType::Slash) || check(TokenType::Slash))
     {
         Token t = current();
         curr++;
 
-        auto right = primary();
+        auto right = unary();
 
         left = std::make_unique<BinaryExpression>(
             std::move(left),

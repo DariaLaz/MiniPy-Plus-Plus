@@ -17,6 +17,7 @@ private:
     std::unique_ptr<Expression> expression();
     std::unique_ptr<Expression> term();
     std::unique_ptr<Expression> factor();
+    std::unique_ptr<Expression> unary();
     std::unique_ptr<Expression> primary();
 
     const Token &current() const;

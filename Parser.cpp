@@ -11,6 +11,7 @@
 #include "AST/Statement/BlockStatement.h"
 #include "AST/Statement/ExpressionStatement.h"
 #include "AST/Statement/IfStatement.h"
+#include "AST/Statement/PrintStatement.h"
 #include "AST/Statement/WhileStatement.h"
 #include "Parser.h"
 
@@ -119,7 +120,7 @@ std::unique_ptr<Expression> Parser::unary()
 
 std::unique_ptr<Expression> Parser::factor()
 {
-    return binary_expr(&Parser::unary, {TokenType::Slash, TokenType::Slash});
+    return binary_expr(&Parser::unary, {TokenType::Star, TokenType::Slash});
 }
 
 std::unique_ptr<Expression> Parser::term()
@@ -175,6 +176,23 @@ std::unique_ptr<Statement> Parser::if_statement()
         std::move(else_branch));
 }
 
+std::unique_ptr<Statement> Parser::print_statement()
+{
+    if (!match(TokenType::LeftParen))
+    {
+        throw std::runtime_error("Expected '(' after print");
+    }
+
+    auto value = expression();
+
+    if (!match(TokenType::RightParen))
+    {
+        throw std::runtime_error("Expected ')' after print expression");
+    }
+
+    return std::make_unique<PrintStatement>(std::move(value));
+}
+
 std::unique_ptr<Statement> Parser::while_statement()
 {
     auto condition = expression();
@@ -215,6 +233,11 @@ std::unique_ptr<Statement> Parser::statement()
     if (match(TokenType::While))
     {
         return while_statement();
+    }
+
+    if (match(TokenType::Print))
+    {
+        return print_statement();
     }
 
     auto stmt = simple_statement();

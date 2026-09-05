@@ -162,6 +162,9 @@ Token Lexer::tokenize_identifier_or_keyword()
     if (identifier == "while")
         return {TokenType::While, identifier};
 
+    if (identifier == "print")
+        return {TokenType::Print, identifier};
+
     return {TokenType::Identifier, identifier};
 }
 

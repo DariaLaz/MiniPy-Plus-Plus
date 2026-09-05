@@ -32,6 +32,8 @@ enum class TokenType
 
     While,
 
+    Print,
+
     Newline,
     Indent,
     Dedent,

@@ -3,8 +3,8 @@
 #include <sstream>
 #include <string>
 
-#include "Lexer.h"
-#include "Parser.h"
+#include "Lexer/Lexer.h"
+#include "Parser/Parser.h"
 
 void print_value(const Value &value)
 {

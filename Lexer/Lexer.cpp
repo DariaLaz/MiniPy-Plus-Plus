@@ -1,4 +1,4 @@
-#include "Lexer.h"
+#include "Lexer/Lexer.h"
 #include <stdexcept>
 
 Lexer::Lexer(const std::string &source) : source(source) {}

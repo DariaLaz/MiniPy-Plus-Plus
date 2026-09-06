@@ -47,6 +47,12 @@ std::vector<Token> Lexer::tokenize()
             continue;
         }
 
+        if (curr_char == '"')
+        {
+            tokens.push_back(tokenize_string());
+            continue;
+        }
+
         tokens.push_back(tokenize_symbol());
         curr++;
     }
@@ -166,6 +172,32 @@ Token Lexer::tokenize_identifier_or_keyword()
         return {TokenType::Print, identifier};
 
     return {TokenType::Identifier, identifier};
+}
+
+Token Lexer::tokenize_string()
+{
+    curr++;
+    std::string value;
+
+    while (curr < source.size() && source[curr] != '"')
+    {
+        if (source[curr] == '\n')
+        {
+            throw std::runtime_error("Unterminated string");
+        }
+
+        value += source[curr];
+        curr++;
+    }
+
+    if (curr >= source.size())
+    {
+        throw std::runtime_error("Unterminated string");
+    }
+
+    curr++;
+
+    return {TokenType::String, value};
 }
 
 bool Lexer::is_identifier() const

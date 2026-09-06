@@ -4,6 +4,7 @@
 enum class TokenType
 {
     Number,
+    String,
     Identifier,
 
     Plus,

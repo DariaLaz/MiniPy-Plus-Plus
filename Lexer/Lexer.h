@@ -22,6 +22,7 @@ private:
     Token tokenize_symbol();
     Token tokenize_number();
     Token tokenize_identifier_or_keyword();
+    Token tokenize_string();
 
     bool is_identifier() const;
     bool is_digit() const;

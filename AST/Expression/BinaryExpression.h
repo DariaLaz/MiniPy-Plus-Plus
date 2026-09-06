@@ -8,10 +8,6 @@
 class BinaryExpression : public Expression
 {
 public:
-    std::unique_ptr<Expression> left;
-    Token op;
-    std::unique_ptr<Expression> right;
-
     BinaryExpression(
         std::unique_ptr<Expression> left,
         Token op,
@@ -30,7 +26,7 @@ public:
         switch (op.type)
         {
         case TokenType::Plus:
-            return std::get<int>(left_value) + std::get<int>(right_value);
+            return add(left_value, right_value);
 
         case TokenType::Minus:
             return std::get<int>(left_value) - std::get<int>(right_value);
@@ -45,10 +41,10 @@ public:
             return std::get<int>(left_value) / std::get<int>(right_value);
 
         case TokenType::EqualEqual:
-            return std::get<int>(left_value) == std::get<int>(right_value);
+            return left_value == right_value;
 
         case TokenType::NotEqual:
-            return std::get<int>(left_value) != std::get<int>(right_value);
+            return left_value != right_value;
 
         case TokenType::Less:
             return std::get<int>(left_value) < std::get<int>(right_value);
@@ -66,4 +62,9 @@ public:
             throw std::runtime_error("Invalid operator");
         }
     }
+
+private:
+    std::unique_ptr<Expression> left;
+    Token op;
+    std::unique_ptr<Expression> right;
 };

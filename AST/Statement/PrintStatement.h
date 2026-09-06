@@ -27,6 +27,10 @@ public:
         {
             std::cout << (std::get<bool>(value) ? "True" : "False");
         }
+        else if (std::holds_alternative<std::string>(value))
+        {
+            std::cout << std::get<std::string>(value);
+        }
 
         std::cout << '\n';
 

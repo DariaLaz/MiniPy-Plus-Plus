@@ -8,6 +8,7 @@
 #include "AST/Expression/NumberExpression.h"
 #include "AST/Expression/UnaryExpression.h"
 #include "AST/Expression/VariableExpression.h"
+#include "AST/Expression/StringExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -46,6 +47,11 @@ std::unique_ptr<Expression> ExpressionParser::primary()
     if (tokens.match(TokenType::False))
     {
         return std::make_unique<BoolExpression>(false);
+    }
+
+    if (tokens.match(TokenType::String))
+    {
+        return std::make_unique<StringExpression>(tokens.prev().text);
     }
 
     throw std::runtime_error("Expected expression");

@@ -169,25 +169,61 @@ Token Lexer::tokenize_string()
     curr++;
     std::string value;
 
-    while (curr < source.size() && source[curr] != '"')
+    while (curr < source.size())
     {
+        if (source[curr] == '"')
+        {
+            curr++;
+            return {TokenType::String, value};
+        }
+
         if (source[curr] == '\n')
         {
             throw std::runtime_error("Unterminated string");
+        }
+
+        if (source[curr] == '\\')
+        {
+            curr++;
+
+            if (curr >= source.size())
+            {
+                throw std::runtime_error("Unterminated escape sequence");
+            }
+
+            char escaped = source[curr];
+
+            switch (escaped)
+            {
+            case 'n':
+                value += '\n';
+                break;
+
+            case 't':
+                value += '\t';
+                break;
+
+            case '"':
+                value += '"';
+                break;
+
+            case '\\':
+                value += '\\';
+                break;
+
+            default:
+                throw std::runtime_error("Unknown escape sequence");
+            }
+
+            curr++;
+            continue;
         }
 
         value += source[curr];
         curr++;
     }
 
-    if (curr >= source.size())
-    {
-        throw std::runtime_error("Unterminated string");
-    }
-
-    curr++;
-
-    return {TokenType::String, value};
+    throw std::runtime_error("Unterminated string");
 }
 
 bool Lexer::is_identifier() const

@@ -38,6 +38,10 @@ void print_value(const Value &value)
 
         std::cout << "]";
     }
+    if (std::holds_alternative<std::monostate>(value))
+    {
+        std::cout << "None";
+    }
 }
 
 bool is_truthy(const Value &value)
@@ -55,6 +59,11 @@ bool is_truthy(const Value &value)
     if (std::holds_alternative<std::string>(value))
     {
         return !std::get<std::string>(value).empty();
+    }
+
+    if (std::holds_alternative<std::monostate>(value))
+    {
+        return false;
     }
 
     return false;

@@ -7,7 +7,7 @@
 
 struct ListValue;
 
-using Value = std::variant<int, bool, std::string, std::shared_ptr<ListValue>>;
+using Value = std::variant<int, bool, std::string, std::shared_ptr<ListValue>, std::monostate>;
 
 struct ListValue
 {

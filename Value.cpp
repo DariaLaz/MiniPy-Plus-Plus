@@ -7,7 +7,11 @@
 
 void print_value(const Value &value)
 {
-    if (std::holds_alternative<int>(value))
+    if (std::holds_alternative<std::monostate>(value))
+    {
+        std::cout << "None";
+    }
+    else if (std::holds_alternative<int>(value))
     {
         std::cout << std::get<int>(value);
     }
@@ -37,10 +41,6 @@ void print_value(const Value &value)
         }
 
         std::cout << "]";
-    }
-    if (std::holds_alternative<std::monostate>(value))
-    {
-        std::cout << "None";
     }
 }
 

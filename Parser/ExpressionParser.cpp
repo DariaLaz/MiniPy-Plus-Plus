@@ -13,6 +13,7 @@
 #include "AST/Expression/IndexExpression.h"
 #include "AST/Expression/CallExpression.h"
 #include "AST/Expression/LogicalExpression.h"
+#include "AST/Expression/NoneExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -61,6 +62,11 @@ std::unique_ptr<Expression> ExpressionParser::primary()
     if (tokens.match(TokenType::String))
     {
         return std::make_unique<StringExpression>(tokens.prev().text);
+    }
+
+    if (tokens.match(TokenType::None))
+    {
+        return std::make_unique<NoneExpression>();
     }
 
     throw std::runtime_error("Expected expression");

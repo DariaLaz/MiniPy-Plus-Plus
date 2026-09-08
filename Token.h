@@ -56,6 +56,8 @@ enum class TokenType
     Or,
     Not,
 
+    None,
+
     End
 };
 

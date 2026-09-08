@@ -31,5 +31,6 @@ if_statement -> "if" expression ":" block
 while_statement → "while" expression ":" block
 simple_statement -> IDENTIFIER "=" expression | expression
 print_statement -> "print" "(" expression ")"
-statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE
+for_statement → "for" IDENTIFIER "in" expression ":" block
+statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE | for_statement
 block -> NEWLINE INDENT statement+ DEDENT

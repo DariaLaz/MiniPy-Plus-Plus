@@ -177,6 +177,12 @@ Token Lexer::tokenize_identifier_or_keyword()
     if (identifier == "print")
         return {TokenType::Print, identifier};
 
+    if (identifier == "for")
+        return {TokenType::For, identifier};
+
+    if (identifier == "in")
+        return {TokenType::In, identifier};
+
     return {TokenType::Identifier, identifier};
 }
 

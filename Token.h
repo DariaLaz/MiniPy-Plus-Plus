@@ -43,6 +43,9 @@ enum class TokenType
     RightBracket,
     Comma,
 
+    For,
+    In,
+
     End
 };
 

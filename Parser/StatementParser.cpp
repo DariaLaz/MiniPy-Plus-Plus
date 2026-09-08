@@ -10,6 +10,7 @@
 #include "AST/Statement/IfStatement.h"
 #include "AST/Statement/PrintStatement.h"
 #include "AST/Statement/WhileStatement.h"
+#include "AST/Statement/ForStatement.h"
 
 StatementParser::StatementParser(
     TokenStream &tokens,
@@ -67,6 +68,37 @@ std::unique_ptr<Statement> StatementParser::if_statement()
         std::move(condition),
         std::move(then),
         std::move(else_branch));
+}
+
+std::unique_ptr<Statement> StatementParser::for_statement()
+{
+    if (!tokens.check(TokenType::Identifier))
+    {
+        throw std::runtime_error("Expected variable after 'for'");
+    }
+
+    std::string variable = tokens.current().text;
+
+    tokens.match(TokenType::Identifier);
+
+    if (!tokens.match(TokenType::In))
+    {
+        throw std::runtime_error("Expected 'in' after for variable");
+    }
+
+    auto iterable = expressions.parse();
+
+    if (!tokens.match(TokenType::Colon))
+    {
+        throw std::runtime_error("Expected ':' after for statement");
+    }
+
+    auto body = block();
+
+    return std::make_unique<ForStatement>(
+        variable,
+        std::move(iterable),
+        std::move(body));
 }
 
 std::unique_ptr<Statement> StatementParser::print_statement()
@@ -131,6 +163,11 @@ std::unique_ptr<Statement> StatementParser::statement()
     if (tokens.match(TokenType::Print))
     {
         return print_statement();
+    }
+
+    if (tokens.match(TokenType::For))
+    {
+        return for_statement();
     }
 
     auto stmt = simple_statement();

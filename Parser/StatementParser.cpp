@@ -15,6 +15,7 @@
 #include "AST/Statement/ReturnStatement.h"
 #include "AST/Statement/BreakStatement.h"
 #include "AST/Statement/ContinueStatement.h"
+#include "AST/Statement/IndexAssignmentStatement.h"
 
 StatementParser::StatementParser(
     TokenStream &tokens,
@@ -166,6 +167,20 @@ std::unique_ptr<Statement> StatementParser::simple_statement()
         return std::make_unique<AssignmentStatement>(name, std::move(value));
     }
 
+    // list[index] = expression
+    if (tokens.check(TokenType::Identifier) && tokens.check_next(TokenType::LeftBracket))
+    {
+        int saved_position = tokens.position();
+
+        auto assignment = index_assignment();
+
+        if (assignment)
+        {
+            return assignment;
+        }
+        tokens.set_position(saved_position);
+    }
+
     return std::make_unique<ExpressionStatement>(expressions.parse());
 }
 
@@ -312,4 +327,32 @@ std::unique_ptr<Statement> StatementParser::block()
     }
 
     return std::make_unique<BlockStatement>(std::move(statements));
+}
+
+std::unique_ptr<Statement> StatementParser::index_assignment()
+{
+    std::string name = tokens.current().text;
+
+    tokens.match(TokenType::Identifier);
+
+    if (!tokens.match(TokenType::LeftBracket))
+    {
+        return nullptr;
+    }
+
+    auto index = expressions.parse();
+
+    if (!tokens.match(TokenType::RightBracket))
+    {
+        throw std::runtime_error("Expected ']' after index");
+    }
+
+    if (!tokens.match(TokenType::Equal))
+    {
+        return nullptr;
+    }
+
+    auto value = expressions.parse();
+
+    return std::make_unique<IndexAssignmentStatement>(name, std::move(index), std::move(value));
 }

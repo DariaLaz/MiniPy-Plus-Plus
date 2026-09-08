@@ -27,6 +27,8 @@ private:
     std::unique_ptr<Statement> print_statement();
     std::unique_ptr<Statement> block();
 
+    std::unique_ptr<Statement> index_assignment();
+
     TokenStream &tokens;
     ExpressionParser &expressions;
 };

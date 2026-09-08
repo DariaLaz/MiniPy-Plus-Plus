@@ -29,7 +29,8 @@ if_statement -> "if" expression ":" block
 ("elif" expression ":" block)\*
 ("else" ":" block)?
 while_statement → "while" expression ":" block
-simple_statement -> IDENTIFIER "=" expression | expression
+simple_statement -> IDENTIFIER "=" expression | expression | IDENTIFIER "[" expression "]" "=" expression
+
 print_statement -> "print" "(" expression ")"
 for_statement → "for" IDENTIFIER "in" expression ":" block
 parameters -> IDENTIFIER ("," IDENTIFIER)\*

@@ -54,3 +54,13 @@ bool TokenStream::match(TokenType type)
     curr++;
     return true;
 }
+
+int TokenStream::position() const
+{
+    return curr;
+}
+
+void TokenStream::set_position(int position)
+{
+    curr = position;
+}

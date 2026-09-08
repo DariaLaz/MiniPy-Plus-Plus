@@ -20,6 +20,9 @@ public:
     bool match(TokenType type);
     int increment(int i = 1) { return curr += i; }
 
+    int position() const;
+    void set_position(int pos);
+
 private:
     int curr = 0;
     const std::vector<Token> &tokens;

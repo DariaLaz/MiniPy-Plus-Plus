@@ -16,9 +16,10 @@ The parser receives tokens and builds the Abstract Syntax Tree
 
 ### Expression Grammar
 
-primary -> NUMBER | STRING | IDENTIFIER | TRUE | FALSE | list | '(' expression ')'
 list -> '[' (expression (',' expression)*)? ']'
-unary -> ("+" | "-") unary | primary
+primary -> NUMBER | STRING | IDENTIFIER | TRUE | FALSE | list | '(' expression ')'
+postfix -> primary ("[" expression "]")\*
+unary -> ("+" | "-") unary | postfix
 factor -> unary (("\*" | "/") unary)\*
 term -> factor (('+' | '-') factor)\*
 comparison -> term ((">" | ">=" | "<" | "<=") term)\*

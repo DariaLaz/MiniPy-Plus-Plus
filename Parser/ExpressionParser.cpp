@@ -10,6 +10,7 @@
 #include "AST/Expression/VariableExpression.h"
 #include "AST/Expression/StringExpression.h"
 #include "AST/Expression/ListExpression.h"
+#include "AST/Expression/IndexExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -83,6 +84,25 @@ std::unique_ptr<Expression> ExpressionParser::list()
     return std::make_unique<ListExpression>(std::move(elements));
 }
 
+std::unique_ptr<Expression> ExpressionParser::postfix()
+{
+    auto expr = primary();
+
+    while (tokens.match(TokenType::LeftBracket))
+    {
+        auto index = expression();
+
+        if (!tokens.match(TokenType::RightBracket))
+        {
+            throw std::runtime_error("Expected ']' after index");
+        }
+
+        expr = std::make_unique<IndexExpression>(std::move(expr), std::move(index));
+    }
+
+    return expr;
+}
+
 std::unique_ptr<Expression> ExpressionParser::unary()
 {
     if (tokens.check({TokenType::Minus, TokenType::Plus}))
@@ -94,7 +114,7 @@ std::unique_ptr<Expression> ExpressionParser::unary()
         return std::make_unique<UnaryExpression>(t, std::move(val));
     }
 
-    return primary();
+    return postfix();
 }
 
 std::unique_ptr<Expression> ExpressionParser::factor()

@@ -1,1 +1,34 @@
-# MiniPy-
+# MiniPy++
+
+MiniPy-Plus-Plus is a small Python-like interpreter written in C++.
+
+## Interpreter Pipeline
+
+## REPL
+
+## Lexer
+
+### Tokens
+
+## Parser
+
+The parser receives tokens and builds the Abstract Syntax Tree
+
+### Expression Grammar
+
+primary -> NUMBER | STRING | IDENTIFIER | TRUE | FALSE | list | '(' expression ')'
+list -> '[' (expression (',' expression)*)? ']'
+unary -> ("+" | "-") unary | primary
+factor -> unary (("\*" | "/") unary)\*
+term -> factor (('+' | '-') factor)\*
+comparison -> term ((">" | ">=" | "<" | "<=") term)\*
+equality -> comparison (("==" | "!=") comparison)\*
+expression -> equality
+if_statement -> "if" expression ":" block
+("elif" expression ":" block)\*
+("else" ":" block)?
+while_statement → "while" expression ":" block
+simple_statement -> IDENTIFIER "=" expression | expression
+print_statement -> "print" "(" expression ")"
+statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE
+block -> NEWLINE INDENT statement+ DEDENT

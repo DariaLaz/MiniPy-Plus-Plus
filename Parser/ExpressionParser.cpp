@@ -9,6 +9,7 @@
 #include "AST/Expression/UnaryExpression.h"
 #include "AST/Expression/VariableExpression.h"
 #include "AST/Expression/StringExpression.h"
+#include "AST/Expression/ListExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -49,12 +50,37 @@ std::unique_ptr<Expression> ExpressionParser::primary()
         return std::make_unique<BoolExpression>(false);
     }
 
+    if (tokens.match(TokenType::LeftBracket))
+    {
+        return list();
+    }
+
     if (tokens.match(TokenType::String))
     {
         return std::make_unique<StringExpression>(tokens.prev().text);
     }
 
     throw std::runtime_error("Expected expression");
+}
+
+std::unique_ptr<Expression> ExpressionParser::list()
+{
+    std::vector<std::unique_ptr<Expression>> elements;
+
+    if (!tokens.check(TokenType::RightBracket))
+    {
+        do
+        {
+            elements.push_back(expression());
+        } while (tokens.match(TokenType::Comma));
+    }
+
+    if (!tokens.match(TokenType::RightBracket))
+    {
+        throw std::runtime_error("Expected ']' after list");
+    }
+
+    return std::make_unique<ListExpression>(std::move(elements));
 }
 
 std::unique_ptr<Expression> ExpressionParser::unary()

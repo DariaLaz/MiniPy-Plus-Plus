@@ -39,6 +39,10 @@ enum class TokenType
     Indent,
     Dedent,
 
+    LeftBracket,
+    RightBracket,
+    Comma,
+
     End
 };
 

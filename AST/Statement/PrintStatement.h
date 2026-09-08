@@ -19,19 +19,7 @@ public:
     {
         Value value = expression->evaluate(env);
 
-        if (std::holds_alternative<int>(value))
-        {
-            std::cout << std::get<int>(value);
-        }
-        else if (std::holds_alternative<bool>(value))
-        {
-            std::cout << (std::get<bool>(value) ? "True" : "False");
-        }
-        else if (std::holds_alternative<std::string>(value))
-        {
-            std::cout << std::get<std::string>(value);
-        }
-
+        print_value(value);
         std::cout << '\n';
 
         return std::nullopt;

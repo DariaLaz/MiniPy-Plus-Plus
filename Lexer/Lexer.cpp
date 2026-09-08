@@ -101,6 +101,12 @@ Token Lexer::tokenize_symbol()
         return {TokenType::LeftParen, "("};
     case ')':
         return {TokenType::RightParen, ")"};
+    case '[':
+        return {TokenType::LeftBracket, "["};
+    case ']':
+        return {TokenType::RightBracket, "]"};
+    case ',':
+        return {TokenType::Comma, ","};
     case ':':
         return {TokenType::Colon, ":"};
     case '=':

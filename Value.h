@@ -1,41 +1,21 @@
 #pragma once
 
+#include <memory>
+#include <string>
 #include <variant>
+#include <vector>
 
-using Value = std::variant<int, bool, std::string>;
+struct ListValue;
 
-inline bool is_truthy(const Value &value)
+using Value = std::variant<int, bool, std::string, std::shared_ptr<ListValue>>;
+
+struct ListValue
 {
-    if (std::holds_alternative<bool>(value))
-    {
-        return std::get<bool>(value);
-    }
+    std::vector<Value> elements;
+};
 
-    if (std::holds_alternative<int>(value))
-    {
-        return std::get<int>(value) != 0;
-    }
+void print_value(const Value &value);
 
-    if (std::holds_alternative<std::string>(value))
-    {
-        return !std::get<std::string>(value).empty();
-    }
+bool is_truthy(const Value &value);
 
-    return false;
-}
-
-inline Value add(const Value &left, const Value &right)
-{
-    if (std::holds_alternative<int>(left) && std::holds_alternative<int>(right))
-    {
-        return std::get<int>(left) + std::get<int>(right);
-    }
-    else if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right))
-    {
-        return std::get<std::string>(left) + std::get<std::string>(right);
-    }
-    else
-    {
-        throw std::runtime_error("Invalid operands for addition");
-    }
-}
+Value add(const Value &left, const Value &right);

@@ -1,23 +1,12 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include "Lexer/Lexer.h"
 #include "Parser/Parser.h"
-
-void print_value(const Value &value)
-{
-    if (std::holds_alternative<int>(value))
-    {
-        std::cout << std::get<int>(value);
-    }
-    else if (std::holds_alternative<bool>(value))
-    {
-        std::cout
-            << (std::get<bool>(value) ? "True" : "False");
-    }
-}
+#include "AST/Environment.h"
 
 std::string read_file(const std::string &filename)
 {
@@ -38,7 +27,8 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        std::cerr << "Wrong arguments, please provide a source file\n";
+        std::cerr << "Usage: " << argv[0] << " <source-file>\n";
+
         return 1;
     }
 
@@ -47,20 +37,13 @@ int main(int argc, char *argv[])
         std::string source = read_file(argv[1]);
 
         Lexer lexer(source);
-        auto tokens = lexer.tokenize();
+        std::vector<Token> tokens = lexer.tokenize();
 
         Parser parser(tokens);
-        auto program = parser.parse();
+        std::unique_ptr<Statement> program = parser.parse();
 
         Environment env;
-
-        auto result = program->execute(env);
-
-        if (result.has_value())
-        {
-            print_value(*result);
-            std::cout << '\n';
-        }
+        program->execute(env);
     }
     catch (const std::exception &e)
     {

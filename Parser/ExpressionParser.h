@@ -21,6 +21,7 @@ private:
     std::unique_ptr<Expression> unary();
     std::unique_ptr<Expression> postfix();
     std::unique_ptr<Expression> list();
+    std::unique_ptr<Expression> dictionary();
     std::unique_ptr<Expression> primary();
 
     template <typename T>

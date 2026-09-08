@@ -15,10 +15,7 @@ Value AppendBuiltin::func(
         throw std::runtime_error("append() expects 2 arguments");
     }
 
-    if (!std::holds_alternative<std::shared_ptr<ListValue>>(args[0]))
-    {
-        throw std::runtime_error("append() first argument must be a list");
-    }
+    validate_alternative<std::shared_ptr<ListValue>>(args[0], "append() first argument must be a list");
 
     auto list = std::get<std::shared_ptr<ListValue>>(args[0]);
 

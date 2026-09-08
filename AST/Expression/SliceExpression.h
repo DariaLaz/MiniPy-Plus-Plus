@@ -70,10 +70,7 @@ private:
 
         Value value = expression->evaluate(env);
 
-        if (!std::holds_alternative<int>(value))
-        {
-            throw std::runtime_error("Slice indices must be integers");
-        }
+        validate_alternative<int>(value, "Slice indices must be integers");
 
         return std::get<int>(value);
     }

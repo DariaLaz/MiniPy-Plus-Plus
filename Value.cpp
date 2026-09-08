@@ -58,6 +58,31 @@ std::string value_to_string(const Value &value)
         return "<built-in function>";
     }
 
+    if (std::holds_alternative<std::shared_ptr<DictValue>>(value))
+    {
+        auto dict = std::get<std::shared_ptr<DictValue>>(value);
+
+        std::string result = "{";
+
+        std::size_t i = 0;
+
+        for (const auto &[key, val] : dict->elements)
+        {
+            result += key;
+            result += ": ";
+            result += value_to_string(val);
+
+            if (++i < dict->elements.size())
+            {
+                result += ", ";
+            }
+        }
+
+        result += "}";
+
+        return result;
+    }
+
     throw std::runtime_error("Cannot convert value to string");
 }
 
@@ -81,6 +106,12 @@ bool is_truthy(const Value &value)
     if (std::holds_alternative<std::monostate>(value))
     {
         return false;
+    }
+
+    if (std::holds_alternative<std::shared_ptr<DictValue>>(value))
+    {
+        auto dict = std::get<std::shared_ptr<DictValue>>(value);
+        return !dict->elements.empty();
     }
 
     return false;

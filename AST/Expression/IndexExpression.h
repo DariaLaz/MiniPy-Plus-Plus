@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "AST/Expression/Expression.h"
+#include "AST/utils.h"
 
 class IndexExpression : public Expression
 {
@@ -19,38 +20,40 @@ public:
         Value object_value = object->evaluate(env);
         Value index_value = index->evaluate(env);
 
-        if (!std::holds_alternative<int>(index_value))
+        if (std::holds_alternative<std::shared_ptr<DictValue>>(object_value))
         {
-            throw std::runtime_error("List index must be an integer");
-        }
+            validate_alternative<std::string>(index_value, "Dict key must be a string");
 
-        int i = std::get<int>(index_value);
+            auto dict = std::get<std::shared_ptr<DictValue>>(object_value);
+            auto &key = std::get<std::string>(index_value);
+
+            auto val = dict->elements.find(key);
+            if (val == dict->elements.end())
+            {
+                throw std::runtime_error("Dictionary key not found: " + key);
+            }
+
+            return val->second;
+        }
 
         if (std::holds_alternative<std::shared_ptr<ListValue>>(object_value))
         {
+            const auto &list = std::get<std::shared_ptr<ListValue>>(object_value);
 
-            auto list = std::get<std::shared_ptr<ListValue>>(object_value);
+            validate_alternative<int>(index_value, "Index must be an integer");
 
-            i = normalize_index(i, list->elements.size());
-
-            if (i < 0 || i >= list->elements.size())
-            {
-                throw std::runtime_error("List index out of range");
-            }
+            int i = normalize_int_index(index_value, list->elements.size());
 
             return list->elements[i];
         }
 
         if (std::holds_alternative<std::string>(object_value))
         {
-            const std::string &str = std::get<std::string>(object_value);
+            const auto &str = std::get<std::string>(object_value);
 
-            i = normalize_index(i, str.size());
+            validate_alternative<int>(index_value, "Index must be an integer");
 
-            if (i < 0 || i >= str.size())
-            {
-                throw std::runtime_error("String index out of range");
-            }
+            int i = normalize_int_index(index_value, str.size());
 
             return std::string(1, str[i]);
         }
@@ -61,14 +64,4 @@ public:
 private:
     std::unique_ptr<Expression> object;
     std::unique_ptr<Expression> index;
-
-    int normalize_index(int index, int size) const
-    {
-        if (index < 0)
-        {
-            index += size;
-        }
-
-        return index;
-    }
 };

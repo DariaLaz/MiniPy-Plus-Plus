@@ -17,7 +17,14 @@ The parser receives tokens and builds the Abstract Syntax Tree
 ### Expression Grammar
 
 list -> '[' (expression (',' expression)*)? ']'
-primary -> NUMBER | STRING | IDENTIFIER | TRUE | FALSE | list | '(' expression ')' | NONE
+dictionary ->
+"{"
+(
+expression ":" expression
+("," expression ":" expression)\*
+)?
+"}"
+primary -> NUMBER | STRING | IDENTIFIER | TRUE | FALSE | list | '(' expression ')' | NONE | dictionary
 postfix -> primary ("[" expression "]")\* | "(" (expression ("," expression)\*)? ")" | "[" expression? ":" expression? "]"
 unary -> ("+" | "-") unary | postfix
 factor -> unary (("\*" | "/") unary)\*
@@ -33,7 +40,6 @@ if_statement -> "if" expression ":" block
 ("else" ":" block)?
 while_statement → "while" expression ":" block
 simple_statement -> IDENTIFIER "=" expression | expression | IDENTIFIER "[" expression "]" "=" expression
-
 for_statement → "for" IDENTIFIER "in" expression ":" block
 parameters -> IDENTIFIER ("," IDENTIFIER)\*
 function_statement -> "def" IDENTIFIER "(" parameters? ")" ":" block

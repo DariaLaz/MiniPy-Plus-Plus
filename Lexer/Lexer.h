@@ -35,6 +35,7 @@ public:
 private:
     std::string source;
     int curr = 0;
+    int grouping_depth = 0;
 
     std::vector<int> indent_levels = {0};
     bool line_start = true;

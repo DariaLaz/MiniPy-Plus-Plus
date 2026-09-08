@@ -21,8 +21,8 @@ enum class TokenType
     Greater,
     GreaterEqual,
 
-    LeftParen,
-    RightParen,
+    LeftParen,  // (
+    RightParen, // )
     Colon,
 
     If,
@@ -37,8 +37,8 @@ enum class TokenType
     Indent,
     Dedent,
 
-    LeftBracket,
-    RightBracket,
+    LeftBracket,  // [
+    RightBracket, // ]
     Comma,
 
     For,
@@ -55,6 +55,9 @@ enum class TokenType
     Not,
 
     None,
+
+    LeftBrace,  // {
+    RightBrace, // }
 
     End
 };

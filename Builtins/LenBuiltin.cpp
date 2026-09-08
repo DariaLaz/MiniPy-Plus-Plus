@@ -27,5 +27,12 @@ Value LenBuiltin::func(const std::vector<Value> &args) const
         return static_cast<int>(list->elements.size());
     }
 
+    if (std::holds_alternative<
+            std::shared_ptr<DictValue>>(value))
+    {
+        auto dict = std::get<std::shared_ptr<DictValue>>(value);
+        return static_cast<int>(dict->elements.size());
+    }
+
     throw std::runtime_error("Object has no len()");
 }

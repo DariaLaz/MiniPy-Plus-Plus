@@ -14,10 +14,7 @@ Value RangeBuiltin::func(const std::vector<Value> &args) const
 
     for (const Value &arg : args)
     {
-        if (!std::holds_alternative<int>(arg))
-        {
-            throw std::runtime_error("range() arguments must be integers");
-        }
+        validate_alternative<int>(arg, "range() arguments must be integers");
     }
 
     int start = 0;

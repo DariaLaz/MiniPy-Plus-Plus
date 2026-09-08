@@ -15,6 +15,7 @@
 #include "AST/Expression/LogicalExpression.h"
 #include "AST/Expression/NoneExpression.h"
 #include "AST/Expression/SliceExpression.h"
+#include "AST/Expression/DictExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -70,7 +71,46 @@ std::unique_ptr<Expression> ExpressionParser::primary()
         return std::make_unique<NoneExpression>();
     }
 
+    if (tokens.match(TokenType::LeftBrace))
+    {
+        return dictionary();
+    }
+
     throw std::runtime_error("Expected expression");
+}
+
+std::unique_ptr<Expression> ExpressionParser::dictionary()
+{
+    std::vector<DictExpression::Entry> entries;
+
+    if (!tokens.check(TokenType::RightBrace))
+    {
+        while (true)
+        {
+            auto key = expression();
+
+            if (!tokens.match(TokenType::Colon))
+            {
+                throw std::runtime_error("Expected ':' after dictionary key");
+            }
+
+            auto value = expression();
+
+            entries.emplace_back(std::move(key), std::move(value));
+
+            if (!tokens.match(TokenType::Comma))
+            {
+                break;
+            }
+        }
+    }
+
+    if (!tokens.match(TokenType::RightBrace))
+    {
+        throw std::runtime_error("Expected '}' after dictionary");
+    }
+
+    return std::make_unique<DictExpression>(std::move(entries));
 }
 
 std::unique_ptr<Expression> ExpressionParser::list()

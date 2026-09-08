@@ -22,9 +22,15 @@ std::vector<Token> Lexer::tokenize()
 
         if (curr_char == '\n')
         {
+            curr++;
+            if (grouping_depth > 0)
+            {
+                // newline inside (), [] or {}
+                continue;
+            }
+
             tokens.push_back({TokenType::Newline, "\\n"});
 
-            curr++;
             line_start = true;
             continue;
         }
@@ -98,13 +104,23 @@ Token Lexer::tokenize_symbol()
     case '/':
         return {TokenType::Slash, "/"};
     case '(':
+        grouping_depth++;
         return {TokenType::LeftParen, "("};
     case ')':
+        grouping_depth--;
         return {TokenType::RightParen, ")"};
     case '[':
+        grouping_depth++;
         return {TokenType::LeftBracket, "["};
     case ']':
+        grouping_depth--;
         return {TokenType::RightBracket, "]"};
+    case '{':
+        grouping_depth++;
+        return {TokenType::LeftBrace, "{"};
+    case '}':
+        grouping_depth--;
+        return {TokenType::RightBrace, "}"};
     case ',':
         return {TokenType::Comma, ","};
     case ':':

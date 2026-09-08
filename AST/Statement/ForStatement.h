@@ -21,10 +21,7 @@ public:
     {
         Value value = iterable->evaluate(env);
 
-        if (!std::holds_alternative<std::shared_ptr<ListValue>>(value))
-        {
-            throw std::runtime_error("Object is not iterable");
-        }
+        validate_alternative<std::shared_ptr<ListValue>>(value, "Object is not iterable");
 
         auto list = std::get<std::shared_ptr<ListValue>>(value);
 

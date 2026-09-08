@@ -7,6 +7,7 @@
 #include "Lexer/Lexer.h"
 #include "Parser/Parser.h"
 #include "AST/Environment.h"
+#include "Builtins/utils.h"
 
 std::string read_file(const std::string &filename)
 {
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
         std::unique_ptr<Statement> program = parser.parse();
 
         Environment env;
+        install_builtins(env);
         program->execute(env);
     }
     catch (const std::exception &e)

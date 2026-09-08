@@ -4,12 +4,14 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <functional>
 
 class Statement;
 class Environment;
 
 struct ListValue;
 struct FunctionValue;
+struct BuildinFunctionValue;
 
 using Value = std::variant<
     int,
@@ -17,6 +19,7 @@ using Value = std::variant<
     std::string,
     std::shared_ptr<ListValue>,
     std::shared_ptr<FunctionValue>,
+    std::shared_ptr<BuildinFunctionValue>,
     std::monostate>;
 
 struct ListValue
@@ -33,7 +36,13 @@ struct FunctionValue
     Environment *closure;
 };
 
-void print_value(const Value &value);
+struct BuildinFunctionValue
+{
+    std::string name;
+    std::function<Value(const std::vector<Value> &)> function;
+};
+
+std::string value_to_string(const Value &value);
 
 bool is_truthy(const Value &value);
 

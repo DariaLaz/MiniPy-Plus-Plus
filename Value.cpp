@@ -5,43 +5,60 @@
 #include <vector>
 #include <memory>
 
-void print_value(const Value &value)
+std::string value_to_string(const Value &value)
 {
     if (std::holds_alternative<std::monostate>(value))
     {
-        std::cout << "None";
+        return "None";
     }
-    else if (std::holds_alternative<int>(value))
+
+    if (std::holds_alternative<int>(value))
     {
-        std::cout << std::get<int>(value);
+        return std::to_string(std::get<int>(value));
     }
-    else if (std::holds_alternative<bool>(value))
+
+    if (std::holds_alternative<bool>(value))
     {
-        std::cout << (std::get<bool>(value) ? "True" : "False");
+        return std::get<bool>(value) ? "True" : "False";
     }
-    else if (std::holds_alternative<std::string>(value))
+
+    if (std::holds_alternative<std::string>(value))
     {
-        std::cout << std::get<std::string>(value);
+        return std::get<std::string>(value);
     }
-    else if (
-        std::holds_alternative<std::shared_ptr<ListValue>>(value))
+
+    if (std::holds_alternative<std::shared_ptr<ListValue>>(value))
     {
         auto list = std::get<std::shared_ptr<ListValue>>(value);
 
-        std::cout << "[";
+        std::string result = "[";
 
         for (std::size_t i = 0; i < list->elements.size(); ++i)
         {
-            print_value(list->elements[i]);
+            result += value_to_string(list->elements[i]);
 
             if (i + 1 < list->elements.size())
             {
-                std::cout << ", ";
+                result += ", ";
             }
         }
 
-        std::cout << "]";
+        result += "]";
+
+        return result;
     }
+
+    if (std::holds_alternative<std::shared_ptr<FunctionValue>>(value))
+    {
+        return "<function>";
+    }
+
+    if (std::holds_alternative<std::shared_ptr<BuildinFunctionValue>>(value))
+    {
+        return "<built-in function>";
+    }
+
+    throw std::runtime_error("Cannot convert value to string");
 }
 
 bool is_truthy(const Value &value)

@@ -8,7 +8,6 @@
 #include "AST/Statement/BlockStatement.h"
 #include "AST/Statement/ExpressionStatement.h"
 #include "AST/Statement/IfStatement.h"
-#include "AST/Statement/PrintStatement.h"
 #include "AST/Statement/WhileStatement.h"
 #include "AST/Statement/ForStatement.h"
 #include "AST/Statement/FunctionStatement.h"
@@ -104,23 +103,6 @@ std::unique_ptr<Statement> StatementParser::for_statement()
         variable,
         std::move(iterable),
         std::move(body));
-}
-
-std::unique_ptr<Statement> StatementParser::print_statement()
-{
-    if (!tokens.match(TokenType::LeftParen))
-    {
-        throw std::runtime_error("Expected '(' after print");
-    }
-
-    auto value = expressions.parse();
-
-    if (!tokens.match(TokenType::RightParen))
-    {
-        throw std::runtime_error("Expected ')' after print expression");
-    }
-
-    return std::make_unique<PrintStatement>(std::move(value));
 }
 
 std::unique_ptr<Statement> StatementParser::while_statement()
@@ -245,11 +227,6 @@ std::unique_ptr<Statement> StatementParser::statement()
     if (tokens.match(TokenType::While))
     {
         return while_statement();
-    }
-
-    if (tokens.match(TokenType::Print))
-    {
-        return print_statement();
     }
 
     if (tokens.match(TokenType::For))

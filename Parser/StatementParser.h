@@ -24,7 +24,6 @@ private:
     std::unique_ptr<Statement> for_statement();
     std::unique_ptr<Statement> if_statement();
     std::unique_ptr<Statement> while_statement();
-    std::unique_ptr<Statement> print_statement();
     std::unique_ptr<Statement> block();
 
     std::unique_ptr<Statement> index_assignment();

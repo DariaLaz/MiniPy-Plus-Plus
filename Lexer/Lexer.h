@@ -13,7 +13,6 @@ inline const std::unordered_map<std::string, TokenType> keyword_map = {
     {"True", TokenType::True},
     {"False", TokenType::False},
     {"while", TokenType::While},
-    {"print", TokenType::Print},
     {"for", TokenType::For},
     {"in", TokenType::In},
     {"def", TokenType::Def},

@@ -156,38 +156,10 @@ Token Lexer::tokenize_identifier_or_keyword()
         curr++;
     }
 
-    if (identifier == "if")
-        return {TokenType::If, identifier};
-
-    if (identifier == "elif")
-        return {TokenType::Elif, identifier};
-
-    if (identifier == "else")
-        return {TokenType::Else, identifier};
-
-    if (identifier == "True")
-        return {TokenType::True, identifier};
-
-    if (identifier == "False")
-        return {TokenType::False, identifier};
-
-    if (identifier == "while")
-        return {TokenType::While, identifier};
-
-    if (identifier == "print")
-        return {TokenType::Print, identifier};
-
-    if (identifier == "for")
-        return {TokenType::For, identifier};
-
-    if (identifier == "in")
-        return {TokenType::In, identifier};
-
-    if (identifier == "def")
-        return {TokenType::Def, identifier};
-
-    if (identifier == "return")
-        return {TokenType::Return, identifier};
+    if (keyword_map.find(identifier) != keyword_map.end())
+    {
+        return {keyword_map.at(identifier), identifier};
+    }
 
     return {TokenType::Identifier, identifier};
 }

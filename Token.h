@@ -49,6 +49,9 @@ enum class TokenType
     Def,
     Return,
 
+    Break,
+    Continue,
+
     End
 };
 

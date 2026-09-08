@@ -6,6 +6,8 @@
 #include "AST/Expression/Expression.h"
 #include "AST/Statement/Statement.h"
 #include "Value.h"
+#include <signals/ContinueSignal.h>
+#include <signals/BreakSignal.h>
 
 class WhileStatement : public Statement
 {
@@ -22,7 +24,18 @@ public:
     {
         while (is_truthy(condition->evaluate(env)))
         {
-            body->execute(env);
+            try
+            {
+                body->execute(env);
+            }
+            catch (const ContinueSignal &)
+            {
+                continue;
+            }
+            catch (const BreakSignal &)
+            {
+                break;
+            }
         }
 
         return std::nullopt;

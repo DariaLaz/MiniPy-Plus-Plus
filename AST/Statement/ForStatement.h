@@ -31,7 +31,18 @@ public:
         for (const Value &element : list->elements)
         {
             env.set(variable, element);
-            body->execute(env);
+            try
+            {
+                body->execute(env);
+            }
+            catch (const ContinueSignal &)
+            {
+                continue;
+            }
+            catch (const BreakSignal &)
+            {
+                break;
+            }
         }
 
         return std::nullopt;

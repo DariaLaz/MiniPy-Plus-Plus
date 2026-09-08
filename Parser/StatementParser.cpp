@@ -13,6 +13,8 @@
 #include "AST/Statement/ForStatement.h"
 #include "AST/Statement/FunctionStatement.h"
 #include "AST/Statement/ReturnStatement.h"
+#include "AST/Statement/BreakStatement.h"
+#include "AST/Statement/ContinueStatement.h"
 
 StatementParser::StatementParser(
     TokenStream &tokens,
@@ -248,6 +250,26 @@ std::unique_ptr<Statement> StatementParser::statement()
     if (tokens.match(TokenType::Return))
     {
         return return_statement();
+    }
+
+    if (tokens.match(TokenType::Break))
+    {
+        if (!tokens.match(TokenType::Newline))
+        {
+            throw std::runtime_error("Expected newline after break");
+        }
+
+        return std::make_unique<BreakStatement>();
+    }
+
+    if (tokens.match(TokenType::Continue))
+    {
+        if (!tokens.match(TokenType::Newline))
+        {
+            throw std::runtime_error("Expected newline after continue");
+        }
+
+        return std::make_unique<ContinueStatement>();
     }
 
     auto stmt = simple_statement();

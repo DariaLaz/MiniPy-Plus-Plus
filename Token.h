@@ -52,6 +52,10 @@ enum class TokenType
     Break,
     Continue,
 
+    And,
+    Or,
+    Not,
+
     End
 };
 

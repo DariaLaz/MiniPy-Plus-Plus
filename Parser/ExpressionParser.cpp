@@ -12,6 +12,7 @@
 #include "AST/Expression/ListExpression.h"
 #include "AST/Expression/IndexExpression.h"
 #include "AST/Expression/CallExpression.h"
+#include "AST/Expression/LogicalExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -147,29 +148,59 @@ std::unique_ptr<Expression> ExpressionParser::unary()
 
 std::unique_ptr<Expression> ExpressionParser::factor()
 {
-    return binary_expr(&ExpressionParser::unary, {TokenType::Star, TokenType::Slash});
+    return binary_expr<BinaryExpression>(&ExpressionParser::unary, {TokenType::Star, TokenType::Slash});
 }
 
 std::unique_ptr<Expression> ExpressionParser::term()
 {
-    return binary_expr(&ExpressionParser::factor, {TokenType::Plus, TokenType::Minus});
+    return binary_expr<BinaryExpression>(&ExpressionParser::factor, {TokenType::Plus, TokenType::Minus});
 }
 
 std::unique_ptr<Expression> ExpressionParser::comparison()
 {
-    return binary_expr(&ExpressionParser::term, {TokenType::Less, TokenType::LessEqual, TokenType::Greater, TokenType::GreaterEqual});
+    return binary_expr<BinaryExpression>(&ExpressionParser::term, {TokenType::Less, TokenType::LessEqual, TokenType::Greater, TokenType::GreaterEqual});
 }
 
 std::unique_ptr<Expression> ExpressionParser::equality()
 {
-    return binary_expr(&ExpressionParser::comparison, {TokenType::EqualEqual, TokenType::NotEqual});
+    return binary_expr<BinaryExpression>(&ExpressionParser::comparison, {TokenType::EqualEqual, TokenType::NotEqual});
+}
+
+std::unique_ptr<Expression> ExpressionParser::not_expression()
+{
+    if (tokens.check(TokenType::Not))
+    {
+        Token op = tokens.current();
+        tokens.increment();
+
+        auto right = not_expression();
+
+        return std::make_unique<UnaryExpression>(
+            op,
+            std::move(right));
+    }
+
+    return equality();
+}
+
+std::unique_ptr<Expression>
+ExpressionParser::and_expression()
+{
+    return binary_expr<LogicalExpression>(&ExpressionParser::not_expression, {TokenType::And});
+}
+
+std::unique_ptr<Expression>
+ExpressionParser::or_expression()
+{
+    return binary_expr<LogicalExpression>(&ExpressionParser::and_expression, {TokenType::Or});
 }
 
 std::unique_ptr<Expression> ExpressionParser::expression()
 {
-    return equality();
+    return or_expression();
 }
 
+template <typename T>
 std::unique_ptr<Expression> ExpressionParser::binary_expr(
     std::unique_ptr<Expression> (ExpressionParser::*expr)(),
     std::initializer_list<TokenType> types)
@@ -183,7 +214,7 @@ std::unique_ptr<Expression> ExpressionParser::binary_expr(
 
         auto right = (this->*expr)();
 
-        left = std::make_unique<BinaryExpression>(
+        left = std::make_unique<T>(
             std::move(left),
             op,
             std::move(right));

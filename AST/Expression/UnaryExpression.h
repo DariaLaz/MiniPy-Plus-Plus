@@ -32,6 +32,9 @@ public:
         case TokenType::Plus:
             return value;
 
+        case TokenType::Not:
+            return !is_truthy(value);
+
         default:
             throw std::runtime_error("Invalid unary operator");
         }

@@ -24,7 +24,10 @@ factor -> unary (("\*" | "/") unary)\*
 term -> factor (('+' | '-') factor)\*
 comparison -> term ((">" | ">=" | "<" | "<=") term)\*
 equality -> comparison (("==" | "!=") comparison)\*
-expression -> equality
+not_expression -> "not" not_expression | equality
+and_expression -> not_expression ("and" not_expression)\*
+or_expression -> and_expression ("or" and_expression)\*
+expression -> or_expression
 if_statement -> "if" expression ":" block
 ("elif" expression ":" block)\*
 ("else" ":" block)?

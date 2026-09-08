@@ -20,6 +20,9 @@ inline const std::unordered_map<std::string, TokenType> keyword_map = {
     {"return", TokenType::Return},
     {"break", TokenType::Break},
     {"continue", TokenType::Continue},
+    {"and", TokenType::And},
+    {"or", TokenType::Or},
+    {"not", TokenType::Not},
 };
 
 class Lexer

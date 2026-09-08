@@ -11,6 +11,7 @@
 #include "AST/Expression/StringExpression.h"
 #include "AST/Expression/ListExpression.h"
 #include "AST/Expression/IndexExpression.h"
+#include "AST/Expression/CallExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -84,20 +85,47 @@ std::unique_ptr<Expression> ExpressionParser::list()
     return std::make_unique<ListExpression>(std::move(elements));
 }
 
-std::unique_ptr<Expression> ExpressionParser::postfix()
+std::unique_ptr<Expression>
+ExpressionParser::postfix()
 {
     auto expr = primary();
 
-    while (tokens.match(TokenType::LeftBracket))
+    while (true)
     {
-        auto index = expression();
-
-        if (!tokens.match(TokenType::RightBracket))
+        if (tokens.match(TokenType::LeftBracket))
         {
-            throw std::runtime_error("Expected ']' after index");
-        }
+            auto index = expression();
 
-        expr = std::make_unique<IndexExpression>(std::move(expr), std::move(index));
+            if (!tokens.match(TokenType::RightBracket))
+            {
+                throw std::runtime_error("Expected ']' after index");
+            }
+
+            expr = std::make_unique<IndexExpression>(std::move(expr), std::move(index));
+        }
+        else if (tokens.match(TokenType::LeftParen))
+        {
+            std::vector<std::unique_ptr<Expression>> arguments;
+
+            if (!tokens.check(TokenType::RightParen))
+            {
+                do
+                {
+                    arguments.push_back(expression());
+                } while (tokens.match(TokenType::Comma));
+            }
+
+            if (!tokens.match(TokenType::RightParen))
+            {
+                throw std::runtime_error("Expected ')' after arguments");
+            }
+
+            expr = std::make_unique<CallExpression>(std::move(expr), std::move(arguments));
+        }
+        else
+        {
+            break;
+        }
     }
 
     return expr;

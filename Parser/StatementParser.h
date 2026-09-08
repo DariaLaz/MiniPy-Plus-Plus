@@ -18,6 +18,7 @@ public:
 
 private:
     std::unique_ptr<Statement> statement();
+    std::unique_ptr<Statement> function_statement();
     std::unique_ptr<Statement> simple_statement();
     std::unique_ptr<Statement> for_statement();
     std::unique_ptr<Statement> if_statement();

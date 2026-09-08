@@ -183,6 +183,12 @@ Token Lexer::tokenize_identifier_or_keyword()
     if (identifier == "in")
         return {TokenType::In, identifier};
 
+    if (identifier == "def")
+        return {TokenType::Def, identifier};
+
+    if (identifier == "return")
+        return {TokenType::Return, identifier};
+
     return {TokenType::Identifier, identifier};
 }
 

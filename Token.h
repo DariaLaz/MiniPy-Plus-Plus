@@ -46,6 +46,9 @@ enum class TokenType
     For,
     In,
 
+    Def,
+    Return,
+
     End
 };
 

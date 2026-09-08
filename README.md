@@ -18,7 +18,7 @@ The parser receives tokens and builds the Abstract Syntax Tree
 
 list -> '[' (expression (',' expression)*)? ']'
 primary -> NUMBER | STRING | IDENTIFIER | TRUE | FALSE | list | '(' expression ')'
-postfix -> primary ("[" expression "]")\*
+postfix -> primary ("[" expression "]")\* | "(" (expression ("," expression)\*)? ")"
 unary -> ("+" | "-") unary | postfix
 factor -> unary (("\*" | "/") unary)\*
 term -> factor (('+' | '-') factor)\*
@@ -32,5 +32,9 @@ while_statement → "while" expression ":" block
 simple_statement -> IDENTIFIER "=" expression | expression
 print_statement -> "print" "(" expression ")"
 for_statement → "for" IDENTIFIER "in" expression ":" block
-statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE | for_statement
+parameters -> IDENTIFIER ("," IDENTIFIER)\*
+function_statement -> "def" IDENTIFIER "(" parameters? ")" ":" block
+statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE | for_statement | function_statement
 block -> NEWLINE INDENT statement+ DEDENT
+
+return_statement -> "return" expression? NEWLINE

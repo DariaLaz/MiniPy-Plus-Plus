@@ -11,6 +11,7 @@
 #include "AST/Statement/PrintStatement.h"
 #include "AST/Statement/WhileStatement.h"
 #include "AST/Statement/ForStatement.h"
+#include <FunctionStatement.h>
 
 StatementParser::StatementParser(
     TokenStream &tokens,
@@ -148,6 +149,57 @@ std::unique_ptr<Statement> StatementParser::simple_statement()
     return std::make_unique<ExpressionStatement>(expressions.parse());
 }
 
+std::unique_ptr<Statement> StatementParser::function_statement()
+{
+    if (!tokens.check(TokenType::Identifier))
+    {
+        throw std::runtime_error("Expected function name");
+    }
+
+    std::string name = tokens.current().text;
+
+    tokens.match(TokenType::Identifier);
+
+    if (!tokens.match(TokenType::LeftParen))
+    {
+        throw std::runtime_error("Expected '(' after function name");
+    }
+
+    std::vector<std::string> parameters;
+
+    if (!tokens.check(TokenType::RightParen))
+    {
+        do
+        {
+            if (!tokens.check(TokenType::Identifier))
+            {
+                throw std::runtime_error("Expected parameter name");
+            }
+
+            parameters.push_back(tokens.current().text);
+
+            tokens.match(TokenType::Identifier);
+        } while (tokens.match(TokenType::Comma));
+    }
+
+    if (!tokens.match(TokenType::RightParen))
+    {
+        throw std::runtime_error("Expected ')' after parameters");
+    }
+
+    if (!tokens.match(TokenType::Colon))
+    {
+        throw std::runtime_error("Expected ':' after function declaration");
+    }
+
+    auto body = block();
+
+    return std::make_unique<FunctionStatement>(
+        name,
+        std::move(parameters),
+        std::move(body));
+}
+
 std::unique_ptr<Statement> StatementParser::statement()
 {
     if (tokens.match(TokenType::If))
@@ -168,6 +220,11 @@ std::unique_ptr<Statement> StatementParser::statement()
     if (tokens.match(TokenType::For))
     {
         return for_statement();
+    }
+
+    if (tokens.match(TokenType::Def))
+    {
+        return function_statement();
     }
 
     auto stmt = simple_statement();

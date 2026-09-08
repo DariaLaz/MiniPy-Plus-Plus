@@ -34,7 +34,6 @@ print_statement -> "print" "(" expression ")"
 for_statement → "for" IDENTIFIER "in" expression ":" block
 parameters -> IDENTIFIER ("," IDENTIFIER)\*
 function_statement -> "def" IDENTIFIER "(" parameters? ")" ":" block
-statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE | for_statement | function_statement
-block -> NEWLINE INDENT statement+ DEDENT
-
 return_statement -> "return" expression? NEWLINE
+statement -> if_statement | while_statement | print_statement | simple_statement NEWLINE | for_statement | function_statement | return_statement
+block -> NEWLINE INDENT statement+ DEDENT

@@ -11,7 +11,8 @@
 #include "AST/Statement/PrintStatement.h"
 #include "AST/Statement/WhileStatement.h"
 #include "AST/Statement/ForStatement.h"
-#include <FunctionStatement.h>
+#include "AST/Statement/FunctionStatement.h"
+#include "AST/Statement/ReturnStatement.h"
 
 StatementParser::StatementParser(
     TokenStream &tokens,
@@ -133,6 +134,23 @@ std::unique_ptr<Statement> StatementParser::while_statement()
     return std::make_unique<WhileStatement>(std::move(condition), std::move(body));
 }
 
+std::unique_ptr<Statement> StatementParser::return_statement()
+{
+    std::unique_ptr<Expression> value = nullptr;
+
+    if (!tokens.check(TokenType::Newline))
+    {
+        value = expressions.parse();
+    }
+
+    if (!tokens.match(TokenType::Newline))
+    {
+        throw std::runtime_error("Expected newline after return");
+    }
+
+    return std::make_unique<ReturnStatement>(std::move(value));
+}
+
 std::unique_ptr<Statement> StatementParser::simple_statement()
 {
     if (tokens.check(TokenType::Identifier) && tokens.check_next(TokenType::Equal))
@@ -225,6 +243,11 @@ std::unique_ptr<Statement> StatementParser::statement()
     if (tokens.match(TokenType::Def))
     {
         return function_statement();
+    }
+
+    if (tokens.match(TokenType::Return))
+    {
+        return return_statement();
     }
 
     auto stmt = simple_statement();

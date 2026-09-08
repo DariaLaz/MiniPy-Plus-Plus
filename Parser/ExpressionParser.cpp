@@ -14,6 +14,7 @@
 #include "AST/Expression/CallExpression.h"
 #include "AST/Expression/LogicalExpression.h"
 #include "AST/Expression/NoneExpression.h"
+#include "AST/Expression/SliceExpression.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -92,8 +93,7 @@ std::unique_ptr<Expression> ExpressionParser::list()
     return std::make_unique<ListExpression>(std::move(elements));
 }
 
-std::unique_ptr<Expression>
-ExpressionParser::postfix()
+std::unique_ptr<Expression> ExpressionParser::postfix()
 {
     auto expr = primary();
 
@@ -101,14 +101,46 @@ ExpressionParser::postfix()
     {
         if (tokens.match(TokenType::LeftBracket))
         {
-            auto index = expression();
+            std::unique_ptr<Expression> first = nullptr;
 
-            if (!tokens.match(TokenType::RightBracket))
+            // x[:3]
+            if (!tokens.check(TokenType::Colon))
             {
-                throw std::runtime_error("Expected ']' after index");
+                first = expression();
             }
 
-            expr = std::make_unique<IndexExpression>(std::move(expr), std::move(index));
+            if (tokens.match(TokenType::Colon))
+            {
+                std::unique_ptr<Expression> end = nullptr;
+
+                // x[1:]
+                if (!tokens.check(TokenType::RightBracket))
+                {
+                    end = expression();
+                }
+
+                if (!tokens.match(TokenType::RightBracket))
+                {
+                    throw std::runtime_error("Expected ']' after slice");
+                }
+
+                expr = std::make_unique<SliceExpression>(std::move(expr), std::move(first), std::move(end));
+            }
+
+            else
+            {
+                if (!first)
+                {
+                    throw std::runtime_error("Expected index");
+                }
+
+                if (!tokens.match(TokenType::RightBracket))
+                {
+                    throw std::runtime_error("Expected ']' after index");
+                }
+
+                expr = std::make_unique<IndexExpression>(std::move(expr), std::move(first));
+            }
         }
         else if (tokens.match(TokenType::LeftParen))
         {

@@ -31,6 +31,8 @@ public:
 
             auto list = std::get<std::shared_ptr<ListValue>>(object_value);
 
+            i = normalize_index(i, list->elements.size());
+
             if (i < 0 || i >= list->elements.size())
             {
                 throw std::runtime_error("List index out of range");
@@ -42,6 +44,8 @@ public:
         if (std::holds_alternative<std::string>(object_value))
         {
             const std::string &str = std::get<std::string>(object_value);
+
+            i = normalize_index(i, str.size());
 
             if (i < 0 || i >= str.size())
             {
@@ -57,4 +61,14 @@ public:
 private:
     std::unique_ptr<Expression> object;
     std::unique_ptr<Expression> index;
+
+    int normalize_index(int index, int size) const
+    {
+        if (index < 0)
+        {
+            index += size;
+        }
+
+        return index;
+    }
 };

@@ -16,6 +16,7 @@
 #include "AST/Expression/NoneExpression.h"
 #include "AST/Expression/SliceExpression.h"
 #include "AST/Expression/DictExpression.h"
+#include "Errors/SyntaxError.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -40,7 +41,7 @@ std::unique_ptr<Expression> ExpressionParser::primary()
 
         if (!tokens.match(TokenType::RightParen))
         {
-            throw std::runtime_error("Expected ')'");
+            throw SyntaxError("Expected ')'", tokens.current());
         }
 
         return expr;
@@ -76,7 +77,7 @@ std::unique_ptr<Expression> ExpressionParser::primary()
         return dictionary();
     }
 
-    throw std::runtime_error("Expected expression");
+    throw SyntaxError("Expected expression", tokens.current());
 }
 
 std::unique_ptr<Expression> ExpressionParser::dictionary()
@@ -91,7 +92,7 @@ std::unique_ptr<Expression> ExpressionParser::dictionary()
 
             if (!tokens.match(TokenType::Colon))
             {
-                throw std::runtime_error("Expected ':' after dictionary key");
+                throw SyntaxError("Expected ':' after dictionary key", tokens.current());
             }
 
             auto value = expression();
@@ -107,7 +108,7 @@ std::unique_ptr<Expression> ExpressionParser::dictionary()
 
     if (!tokens.match(TokenType::RightBrace))
     {
-        throw std::runtime_error("Expected '}' after dictionary");
+        throw SyntaxError("Expected '}' after dictionary", tokens.current());
     }
 
     return std::make_unique<DictExpression>(std::move(entries));
@@ -127,7 +128,7 @@ std::unique_ptr<Expression> ExpressionParser::list()
 
     if (!tokens.match(TokenType::RightBracket))
     {
-        throw std::runtime_error("Expected ']' after list");
+        throw SyntaxError("Expected ']' after list", tokens.current());
     }
 
     return std::make_unique<ListExpression>(std::move(elements));
@@ -161,7 +162,7 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
 
                 if (!tokens.match(TokenType::RightBracket))
                 {
-                    throw std::runtime_error("Expected ']' after slice");
+                    throw SyntaxError("Expected ']' after slice", tokens.current());
                 }
 
                 expr = std::make_unique<SliceExpression>(std::move(expr), std::move(first), std::move(end));
@@ -171,12 +172,12 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
             {
                 if (!first)
                 {
-                    throw std::runtime_error("Expected index");
+                    throw SyntaxError("Expected index", tokens.current());
                 }
 
                 if (!tokens.match(TokenType::RightBracket))
                 {
-                    throw std::runtime_error("Expected ']' after index");
+                    throw SyntaxError("Expected ']' after index", tokens.current());
                 }
 
                 expr = std::make_unique<IndexExpression>(std::move(expr), std::move(first));
@@ -196,7 +197,7 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
 
             if (!tokens.match(TokenType::RightParen))
             {
-                throw std::runtime_error("Expected ')' after arguments");
+                throw SyntaxError("Expected ')' after arguments", tokens.current());
             }
 
             expr = std::make_unique<CallExpression>(std::move(expr), std::move(arguments));

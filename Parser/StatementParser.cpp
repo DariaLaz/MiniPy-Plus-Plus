@@ -15,6 +15,7 @@
 #include "AST/Statement/BreakStatement.h"
 #include "AST/Statement/ContinueStatement.h"
 #include "AST/Statement/IndexAssignmentStatement.h"
+#include "Errors/SyntaxError.h"
 
 StatementParser::StatementParser(
     TokenStream &tokens,
@@ -47,7 +48,7 @@ std::unique_ptr<Statement> StatementParser::if_statement()
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw std::runtime_error("Expected ':' after 'if' condition");
+        throw SyntaxError("Expected ':' after 'if' condition", tokens.current());
     }
 
     auto then = block();
@@ -62,7 +63,7 @@ std::unique_ptr<Statement> StatementParser::if_statement()
     {
         if (!tokens.match(TokenType::Colon))
         {
-            throw std::runtime_error("Expected ':' after else");
+            throw SyntaxError("Expected ':' after else", tokens.current());
         }
 
         else_branch = block();
@@ -78,7 +79,7 @@ std::unique_ptr<Statement> StatementParser::for_statement()
 {
     if (!tokens.check(TokenType::Identifier))
     {
-        throw std::runtime_error("Expected variable after 'for'");
+        throw SyntaxError("Expected variable after 'for'", tokens.current());
     }
 
     std::string variable = tokens.current().text;
@@ -87,14 +88,14 @@ std::unique_ptr<Statement> StatementParser::for_statement()
 
     if (!tokens.match(TokenType::In))
     {
-        throw std::runtime_error("Expected 'in' after for variable");
+        throw SyntaxError("Expected 'in' after for variable", tokens.current());
     }
 
     auto iterable = expressions.parse();
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw std::runtime_error("Expected ':' after for statement");
+        throw SyntaxError("Expected ':' after for statement", tokens.current());
     }
 
     auto body = block();
@@ -111,7 +112,7 @@ std::unique_ptr<Statement> StatementParser::while_statement()
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw std::runtime_error("Expected ':' after 'while' condition");
+        throw SyntaxError("Expected ':' after 'while' condition", tokens.current());
     }
 
     auto body = block();
@@ -130,7 +131,7 @@ std::unique_ptr<Statement> StatementParser::return_statement()
 
     if (!tokens.match(TokenType::Newline))
     {
-        throw std::runtime_error("Expected newline after return");
+        throw SyntaxError("Expected newline after return", tokens.current());
     }
 
     return std::make_unique<ReturnStatement>(std::move(value));
@@ -170,7 +171,7 @@ std::unique_ptr<Statement> StatementParser::function_statement()
 {
     if (!tokens.check(TokenType::Identifier))
     {
-        throw std::runtime_error("Expected function name");
+        throw SyntaxError("Expected function name", tokens.current());
     }
 
     std::string name = tokens.current().text;
@@ -179,7 +180,7 @@ std::unique_ptr<Statement> StatementParser::function_statement()
 
     if (!tokens.match(TokenType::LeftParen))
     {
-        throw std::runtime_error("Expected '(' after function name");
+        throw SyntaxError("Expected '(' after function name", tokens.current());
     }
 
     std::vector<std::string> parameters;
@@ -190,7 +191,7 @@ std::unique_ptr<Statement> StatementParser::function_statement()
         {
             if (!tokens.check(TokenType::Identifier))
             {
-                throw std::runtime_error("Expected parameter name");
+                throw SyntaxError("Expected parameter name", tokens.current());
             }
 
             parameters.push_back(tokens.current().text);
@@ -201,12 +202,12 @@ std::unique_ptr<Statement> StatementParser::function_statement()
 
     if (!tokens.match(TokenType::RightParen))
     {
-        throw std::runtime_error("Expected ')' after parameters");
+        throw SyntaxError("Expected ')' after parameters", tokens.current());
     }
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw std::runtime_error("Expected ':' after function declaration");
+        throw SyntaxError("Expected ':' after function declaration", tokens.current());
     }
 
     auto body = block();
@@ -248,7 +249,7 @@ std::unique_ptr<Statement> StatementParser::statement()
     {
         if (!tokens.match(TokenType::Newline))
         {
-            throw std::runtime_error("Expected newline after break");
+            throw SyntaxError("Expected newline after break", tokens.current());
         }
 
         return std::make_unique<BreakStatement>();
@@ -258,7 +259,7 @@ std::unique_ptr<Statement> StatementParser::statement()
     {
         if (!tokens.match(TokenType::Newline))
         {
-            throw std::runtime_error("Expected newline after continue");
+            throw SyntaxError("Expected newline after continue", tokens.current());
         }
 
         return std::make_unique<ContinueStatement>();
@@ -268,7 +269,7 @@ std::unique_ptr<Statement> StatementParser::statement()
 
     if (!tokens.match(TokenType::Newline))
     {
-        throw std::runtime_error("Expected newline after statement");
+        throw SyntaxError("Expected newline after statement", tokens.current());
     }
 
     return stmt;
@@ -278,7 +279,7 @@ std::unique_ptr<Statement> StatementParser::block()
 {
     if (!tokens.match(TokenType::Newline))
     {
-        throw std::runtime_error("Expected newline before block");
+        throw SyntaxError("Expected newline before block", tokens.current());
     }
 
     while (tokens.match(TokenType::Newline))
@@ -288,7 +289,7 @@ std::unique_ptr<Statement> StatementParser::block()
 
     if (!tokens.match(TokenType::Indent))
     {
-        throw std::runtime_error("Expected indented block");
+        throw SyntaxError("Expected indented block", tokens.current());
     }
 
     std::vector<std::unique_ptr<Statement>> statements;
@@ -305,7 +306,7 @@ std::unique_ptr<Statement> StatementParser::block()
 
     if (!tokens.match(TokenType::Dedent))
     {
-        throw std::runtime_error("Expected dedent after block");
+        throw SyntaxError("Expected dedent after block", tokens.current());
     }
 
     return std::make_unique<BlockStatement>(std::move(statements));
@@ -326,7 +327,7 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 
     if (!tokens.match(TokenType::RightBracket))
     {
-        throw std::runtime_error("Expected ']' after index");
+        throw SyntaxError("Expected ']' after index", tokens.current());
     }
 
     if (!tokens.match(TokenType::Equal))

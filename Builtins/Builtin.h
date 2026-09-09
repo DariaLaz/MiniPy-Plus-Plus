@@ -12,7 +12,7 @@ public:
     virtual ~Builtin() = default;
 
     virtual std::string name() const = 0;
-    virtual Value func(const std::vector<Value> &args) const = 0;
+    virtual Value func(const std::vector<Value> &args, const SourceLocation &location) const = 0;
 
     std::shared_ptr<BuildinFunctionValue> make();
 };

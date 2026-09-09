@@ -1,4 +1,6 @@
 #include "Builtins/IntBuiltin.h"
+#include "Errors/ValueError.h"
+#include "Errors/TypeError.h"
 
 #include <stdexcept>
 
@@ -7,12 +9,11 @@ std::string IntBuiltin::name() const
     return "int";
 }
 
-Value IntBuiltin::func(
-    const std::vector<Value> &args) const
+Value IntBuiltin::func(const std::vector<Value> &args, const SourceLocation &location) const
 {
     if (args.size() != 1)
     {
-        throw std::runtime_error("int() expects 1 argument");
+        throw TypeError("int() expects 1 argument", location);
     }
 
     const Value &value = args[0];
@@ -41,9 +42,9 @@ Value IntBuiltin::func(
         }
         catch (...)
         {
-            throw std::runtime_error("invalid literal for int(): " + text);
+            throw ValueError("invalid literal for int(): " + text, location);
         }
     }
 
-    throw std::runtime_error("int() unsupported type");
+    throw TypeError("int() unsupported type", location);
 }

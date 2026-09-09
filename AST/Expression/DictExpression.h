@@ -13,9 +13,8 @@ class DictExpression : public Expression
 public:
     using Entry = std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>;
 
-    DictExpression(
-        std::vector<Entry> entries)
-        : entries(std::move(entries))
+    DictExpression(std::vector<Entry> entries, const SourceLocation &location)
+        : entries(std::move(entries)), Expression(location)
     {
     }
 
@@ -27,7 +26,7 @@ public:
         {
             Value key_value = entry.first->evaluate(env);
 
-            validate_alternative<std::string>(key_value, "Dictionary key must be a string");
+            validate_alternative<std::string>(key_value, entry.first->get_location(), "Dictionary key must be a string");
 
             std::string key = std::get<std::string>(key_value);
 

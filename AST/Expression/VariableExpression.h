@@ -7,13 +7,13 @@ class VariableExpression : public Expression
 public:
     std::string name;
 
-    VariableExpression(std::string name)
-        : name(std::move(name))
+    VariableExpression(std::string name, const SourceLocation &location)
+        : name(std::move(name)), Expression(location)
     {
     }
 
     Value evaluate(Environment &env) const override
     {
-        return env.get(name);
+        return env.get(name, get_location());
     }
 };

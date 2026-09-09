@@ -1,4 +1,7 @@
 #include "Lexer/Lexer.h"
+#include "Errors/SyntaxError.h"
+#include "Errors/IndentationError.h"
+
 #include <stdexcept>
 #include <optional>
 
@@ -112,7 +115,7 @@ Token Lexer::tokenize_symbol()
         return comparing_symbol.value();
     }
 
-    throw std::runtime_error(std::string("Unexpected character: ") + source[curr]);
+    throw SyntaxError(std::string("Unexpected character: ") + source[curr], get_location());
 }
 
 std::optional<Token> Lexer::tokenize_grouping_symbol()
@@ -200,7 +203,7 @@ std::optional<Token> Lexer::tokenize_comparing_symbol()
             return make_token(TokenType::NotEqual, "!=");
         }
 
-        throw std::runtime_error("Unexpected character: !");
+        throw SyntaxError("Unexpected character: !", get_location());
     }
 
     return std::nullopt;
@@ -251,7 +254,7 @@ Token Lexer::tokenize_string()
 
         if (source[curr] == '\n')
         {
-            throw std::runtime_error("Unterminated string");
+            throw SyntaxError("Unterminated string", get_location());
         }
 
         if (source[curr] == '\\')
@@ -260,7 +263,7 @@ Token Lexer::tokenize_string()
 
             if (curr >= source.size())
             {
-                throw std::runtime_error("Unterminated escape sequence");
+                throw SyntaxError("Unterminated escape sequence", get_location());
             }
 
             char escaped = source[curr];
@@ -284,7 +287,7 @@ Token Lexer::tokenize_string()
                 break;
 
             default:
-                throw std::runtime_error("Unknown escape sequence");
+                throw SyntaxError("Unknown escape sequence", get_location());
             }
 
             consume();
@@ -294,7 +297,7 @@ Token Lexer::tokenize_string()
         value += consume();
     }
 
-    throw std::runtime_error("Unterminated string");
+    throw SyntaxError("Unterminated string", get_location());
 }
 
 bool Lexer::is_identifier_start() const
@@ -334,7 +337,7 @@ void Lexer::handle_indentation(std::vector<Token> &tokens)
 
     if (curr < source.size() && source[curr] == '\t')
     {
-        throw std::runtime_error("Tabs are not supported for indentation");
+        throw SyntaxError("Tabs are not supported for indentation", get_location());
     }
 
     if (curr >= source.size() || source[curr] == '\n')
@@ -360,7 +363,7 @@ void Lexer::handle_indentation(std::vector<Token> &tokens)
 
         if (spaces != indent_levels.back())
         {
-            throw std::runtime_error("Inconsistent indentation");
+            throw IndentationError("Inconsistent indentation", get_location());
         }
     }
 
@@ -389,4 +392,9 @@ char Lexer::consume()
 Token Lexer::make_token(TokenType type, const std::string &text) const
 {
     return Token{type, text, token_start_line, token_start_column};
+}
+
+SourceLocation Lexer::get_location() const
+{
+    return SourceLocation{token_start_line, token_start_column};
 }

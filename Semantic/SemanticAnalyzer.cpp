@@ -11,6 +11,7 @@
 #include "AST/Statement/ReturnStatement.h"
 #include "AST/Statement/BreakStatement.h"
 #include "AST/Statement/ContinueStatement.h"
+#include "Errors/SyntaxError.h"
 
 void SemanticAnalyzer::analyze(const Statement &program)
 {
@@ -67,7 +68,7 @@ void SemanticAnalyzer::visit(const Statement &statement)
         {
             if (!names.insert(parameter).second)
             {
-                throw std::runtime_error("Duplicate parameter: " + parameter);
+                throw SyntaxError("Duplicate parameter: " + parameter, statement.get_location());
             }
         }
 
@@ -86,7 +87,7 @@ void SemanticAnalyzer::visit(const Statement &statement)
     {
         if (function_depth == 0)
         {
-            throw std::runtime_error("'return' outside function");
+            throw SyntaxError("'return' outside function", statement.get_location());
         }
     }
 
@@ -94,7 +95,7 @@ void SemanticAnalyzer::visit(const Statement &statement)
     {
         if (loop_depth == 0)
         {
-            throw std::runtime_error("'break' outside loop");
+            throw SyntaxError("'break' outside loop", statement.get_location());
         }
     }
 
@@ -102,7 +103,7 @@ void SemanticAnalyzer::visit(const Statement &statement)
     {
         if (loop_depth == 0)
         {
-            throw std::runtime_error("'continue' outside loop");
+            throw SyntaxError("'continue' outside loop", statement.get_location());
         }
     }
 }

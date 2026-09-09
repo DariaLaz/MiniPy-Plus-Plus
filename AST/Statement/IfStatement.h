@@ -13,10 +13,9 @@ public:
     IfStatement(
         std::unique_ptr<Expression> condition,
         std::unique_ptr<Statement> then,
+        SourceLocation location,
         std::unique_ptr<Statement> else_branch = nullptr)
-        : condition(std::move(condition)),
-          then(std::move(then)),
-          else_branch(std::move(else_branch))
+        : condition(std::move(condition)), then(std::move(then)), else_branch(std::move(else_branch)), Statement(location)
     {
     }
 

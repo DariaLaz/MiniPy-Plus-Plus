@@ -2,15 +2,15 @@
 
 std::shared_ptr<BuildinFunctionValue> Builtin::make()
 {
-    auto native = std::make_shared<BuildinFunctionValue>();
+    auto builtin = std::make_shared<BuildinFunctionValue>();
 
-    native->name = name();
+    builtin->name = name();
 
     auto self = shared_from_this();
-    native->function = [self](const std::vector<Value> &args) -> Value
+    builtin->function = [self](const std::vector<Value> &args, SourceLocation location)
     {
-        return self->func(args);
+        return self->func(args, location);
     };
 
-    return native;
+    return builtin;
 }

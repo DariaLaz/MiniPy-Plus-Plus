@@ -7,8 +7,8 @@
 class StringExpression : public Expression
 {
 public:
-    StringExpression(std::string value)
-        : value(std::move(value))
+    StringExpression(std::string value, const SourceLocation &location)
+        : value(std::move(value)), Expression(location)
     {
     }
 

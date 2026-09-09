@@ -11,8 +11,8 @@
 class SliceExpression : public Expression
 {
 public:
-    SliceExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> start, std::unique_ptr<Expression> end)
-        : object(std::move(object)), start(std::move(start)), end(std::move(end))
+    SliceExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> start, std::unique_ptr<Expression> end, const SourceLocation &location)
+        : object(std::move(object)), start(std::move(start)), end(std::move(end)), Expression(location)
     {
     }
 
@@ -53,7 +53,7 @@ public:
             return str.substr(start_index, end_index - start_index);
         }
 
-        throw std::runtime_error("Object is not sliceable");
+        throw TypeError("Object is not sliceable", get_location());
     }
 
 private:
@@ -70,7 +70,7 @@ private:
 
         Value value = expression->evaluate(env);
 
-        validate_alternative<int>(value, "Slice indices must be integers");
+        validate_alternative<int>(value, expression->get_location(), "Slice indices must be integers");
 
         return std::get<int>(value);
     }

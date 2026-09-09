@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "Value.h"
+#include "Errors/NameError.h"
 
 class Environment : public std::enable_shared_from_this<Environment>
 {
@@ -18,7 +19,7 @@ public:
         values[name] = std::move(value);
     }
 
-    Value get(const std::string &name) const
+    Value get(const std::string &name, SourceLocation location) const
     {
         auto val = values.find(name);
 
@@ -29,10 +30,10 @@ public:
 
         if (parent != nullptr)
         {
-            return parent->get(name);
+            return parent->get(name, location);
         }
 
-        throw std::runtime_error("Undefined variable: " + name);
+        throw NameError("Undefined variable: " + name, location);
     }
 
 private:

@@ -30,4 +30,6 @@ private:
         std::initializer_list<TokenType> types);
 
     TokenStream &tokens;
+
+    SourceLocation get_location() const;
 };

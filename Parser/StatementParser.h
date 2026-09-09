@@ -28,6 +28,8 @@ private:
 
     std::unique_ptr<Statement> index_assignment();
 
+    SourceLocation get_location() const;
+
     TokenStream &tokens;
     ExpressionParser &expressions;
 };

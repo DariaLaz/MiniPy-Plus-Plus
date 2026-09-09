@@ -11,8 +11,8 @@ class BlockStatement : public Statement
 {
 public:
     BlockStatement(
-        std::vector<std::unique_ptr<Statement>> statements)
-        : statements(std::move(statements))
+        std::vector<std::unique_ptr<Statement>> statements, SourceLocation location)
+        : statements(std::move(statements)), Statement(location)
     {
     }
 

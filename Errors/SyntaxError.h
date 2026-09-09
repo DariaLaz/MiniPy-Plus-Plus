@@ -4,13 +4,14 @@
 #include <string>
 
 #include "Token.h"
+#include "Errors/Error.h"
+#include "Utils/SourceLocation.h"
 
-class SyntaxError : public std::runtime_error
+class SyntaxError : public Error
 {
 public:
-    SyntaxError(const std::string &message, const Token &token)
-        : std::runtime_error(
-              "SyntaxError at " + std::to_string(token.line) + ":" + std::to_string(token.column) + ": " + message)
+    SyntaxError(const std::string &message, const SourceLocation &location)
+        : Error("SyntaxError", message, location)
     {
     }
 };

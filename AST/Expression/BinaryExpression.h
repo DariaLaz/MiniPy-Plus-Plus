@@ -4,6 +4,8 @@
 
 #include "AST/Expression/Expression.h"
 #include "Token.h"
+#include "Errors/ZeroDivisionError.h"
+#include "Errors/TypeError.h"
 
 class BinaryExpression : public Expression
 {
@@ -12,7 +14,8 @@ public:
         std::unique_ptr<Expression> left,
         Token op,
         std::unique_ptr<Expression> right)
-        : left(std::move(left)),
+        : Expression({op.line, op.column}),
+          left(std::move(left)),
           op(std::move(op)),
           right(std::move(right))
     {
@@ -26,17 +29,20 @@ public:
         switch (op.type)
         {
         case TokenType::Plus:
-            return add(left_value, right_value);
+            return add(left_value, right_value, get_location());
 
         case TokenType::Minus:
+            validate_operands<int>(left_value, right_value);
             return std::get<int>(left_value) - std::get<int>(right_value);
 
         case TokenType::Star:
+            validate_operands<int>(left_value, right_value);
             return std::get<int>(left_value) * std::get<int>(right_value);
 
         case TokenType::Slash:
+            validate_operands<int>(left_value, right_value);
             if (std::get<int>(right_value) == 0)
-                throw std::runtime_error("Division by zero");
+                throw ZeroDivisionError("Division by zero", get_location());
 
             return std::get<int>(left_value) / std::get<int>(right_value);
 
@@ -47,19 +53,23 @@ public:
             return left_value != right_value;
 
         case TokenType::Less:
+            validate_operands<int>(left_value, right_value);
             return std::get<int>(left_value) < std::get<int>(right_value);
 
         case TokenType::LessEqual:
+            validate_operands<int>(left_value, right_value);
             return std::get<int>(left_value) <= std::get<int>(right_value);
 
         case TokenType::Greater:
+            validate_operands<int>(left_value, right_value);
             return std::get<int>(left_value) > std::get<int>(right_value);
 
         case TokenType::GreaterEqual:
+            validate_operands<int>(left_value, right_value);
             return std::get<int>(left_value) >= std::get<int>(right_value);
 
         default:
-            throw std::runtime_error("Invalid operator");
+            throw std::logic_error("Invalid operator");
         }
     }
 
@@ -67,4 +77,13 @@ private:
     std::unique_ptr<Expression> left;
     Token op;
     std::unique_ptr<Expression> right;
+
+    template <typename T>
+    void validate_operands(const Value &left, const Value &right) const
+    {
+        if (!std::holds_alternative<T>(left) || !std::holds_alternative<T>(right))
+        {
+            throw TypeError("Unsupported operand types for '" + op.text + "'", get_location());
+        }
+    }
 };

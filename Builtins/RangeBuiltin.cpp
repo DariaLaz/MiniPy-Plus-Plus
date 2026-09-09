@@ -1,20 +1,22 @@
 #include "Builtins/RangeBuiltin.h"
+#include "Errors/ValueError.h"
+#include "Errors/TypeError.h"
 
 std::string RangeBuiltin::name() const
 {
     return "range";
 }
 
-Value RangeBuiltin::func(const std::vector<Value> &args) const
+Value RangeBuiltin::func(const std::vector<Value> &args, const SourceLocation &location) const
 {
     if (args.empty() || args.size() > 3)
     {
-        throw std::runtime_error("range() expects 1 to 3 arguments");
+        throw TypeError("range() expects 1 to 3 arguments", location);
     }
 
     for (const Value &arg : args)
     {
-        validate_alternative<int>(arg, "range() arguments must be integers");
+        validate_alternative<int>(arg, location, "range() arguments must be integers");
     }
 
     int start = 0;
@@ -39,7 +41,7 @@ Value RangeBuiltin::func(const std::vector<Value> &args) const
 
     if (step == 0)
     {
-        throw std::runtime_error("range() step cannot be zero");
+        throw ValueError("range() step cannot be zero", location);
     }
 
     auto result = std::make_shared<ListValue>();

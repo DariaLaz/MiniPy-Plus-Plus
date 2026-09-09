@@ -9,8 +9,8 @@ class ExpressionStatement : public Statement
 {
 public:
     ExpressionStatement(
-        std::unique_ptr<Expression> expression)
-        : expression(std::move(expression))
+        std::unique_ptr<Expression> expression, SourceLocation location)
+        : expression(std::move(expression)), Statement(location)
     {
     }
 

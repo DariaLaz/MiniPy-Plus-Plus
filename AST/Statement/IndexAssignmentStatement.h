@@ -7,20 +7,21 @@
 #include "AST/Statement/Statement.h"
 #include "AST/Expression/Expression.h"
 #include "AST/Environment.h"
+#include "Errors/TypeError.h"
 #include "Value.h"
 #include "AST/utils.h"
 
 class IndexAssignmentStatement : public Statement
 {
 public:
-    IndexAssignmentStatement(std::string object_name, std::unique_ptr<Expression> index, std::unique_ptr<Expression> value)
-        : object_name(std::move(object_name)), index(std::move(index)), value(std::move(value))
+    IndexAssignmentStatement(std::string object_name, std::unique_ptr<Expression> index, std::unique_ptr<Expression> value, SourceLocation location)
+        : object_name(std::move(object_name)), index(std::move(index)), value(std::move(value)), Statement(location)
     {
     }
 
     std::optional<Value> execute(Environment &env) const override
     {
-        Value object_value = env.get(object_name);
+        Value object_value = env.get(object_name, index->get_location());
         Value index_value = index->evaluate(env);
 
         if (std::holds_alternative<std::shared_ptr<ListValue>>(object_value))
@@ -28,13 +29,13 @@ public:
 
             auto &list = std::get<std::shared_ptr<ListValue>>(object_value);
 
-            validate_alternative<int>(index_value, "Index must be an integer");
+            validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
 
             int i = normalize_int_index(index_value, list->elements.size());
 
             if (i < 0 || i >= static_cast<int>(list->elements.size()))
             {
-                throw std::runtime_error("List index out of range");
+                throw IndexError("List index out of range", index->get_location());
             }
 
             list->elements[i] = value->evaluate(env);
@@ -44,7 +45,7 @@ public:
 
         if (std::holds_alternative<std::shared_ptr<DictValue>>(object_value))
         {
-            validate_alternative<std::string>(index_value, "Dict key must be a string");
+            validate_alternative<std::string>(index_value, index->get_location(), "Dict key must be a string");
 
             auto dict = std::get<std::shared_ptr<DictValue>>(object_value);
 
@@ -55,7 +56,7 @@ public:
             return std::nullopt;
         }
 
-        throw std::runtime_error("Object should be indexable (list, dict)");
+        throw TypeError("Object should be indexable (list, dict)", get_location());
     }
 
 private:

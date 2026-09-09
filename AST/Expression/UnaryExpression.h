@@ -12,11 +12,8 @@ public:
     Token op;
     std::unique_ptr<Expression> expr;
 
-    UnaryExpression(
-        Token op,
-        std::unique_ptr<Expression> expr)
-        : op(std::move(op)),
-          expr(std::move(expr))
+    UnaryExpression(Token op, std::unique_ptr<Expression> expr, const SourceLocation &location)
+        : op(std::move(op)), expr(std::move(expr)), Expression(location)
     {
     }
 
@@ -36,7 +33,7 @@ public:
             return !is_truthy(value);
 
         default:
-            throw std::runtime_error("Invalid unary operator");
+            throw TypeError("Invalid unary operator", get_location());
         }
     }
 };

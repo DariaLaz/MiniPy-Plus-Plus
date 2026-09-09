@@ -12,7 +12,7 @@ class LogicalExpression : public Expression
 {
 public:
     LogicalExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right))
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)), Expression({op.line, op.column})
     {
     }
 
@@ -40,7 +40,7 @@ public:
             return right->evaluate(env);
         }
 
-        throw std::runtime_error("Invalid logical operator");
+        throw std::logic_error("Invalid logical operator");
     }
 
 private:

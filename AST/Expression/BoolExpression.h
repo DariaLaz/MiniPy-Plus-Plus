@@ -5,7 +5,7 @@
 class BoolExpression : public Expression
 {
 public:
-    BoolExpression(bool value) : value(value)
+    BoolExpression(bool value, const SourceLocation &location) : value(value), Expression(location)
     {
     }
 

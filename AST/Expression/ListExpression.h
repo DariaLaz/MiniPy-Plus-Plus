@@ -9,9 +9,8 @@
 class ListExpression : public Expression
 {
 public:
-    ListExpression(
-        std::vector<std::unique_ptr<Expression>> elements)
-        : elements(std::move(elements))
+    ListExpression(std::vector<std::unique_ptr<Expression>> elements, const SourceLocation &location)
+        : elements(std::move(elements)), Expression(location)
     {
     }
 

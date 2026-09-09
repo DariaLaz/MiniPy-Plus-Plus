@@ -1,17 +1,18 @@
 
 #include "Builtins/Builtin.h"
 #include "Builtins/LenBuiltin.h"
+#include "Errors/TypeError.h"
 
 std::string LenBuiltin::name() const
 {
     return "len";
 }
 
-Value LenBuiltin::func(const std::vector<Value> &args) const
+Value LenBuiltin::func(const std::vector<Value> &args, const SourceLocation &location) const
 {
     if (args.size() != 1)
     {
-        throw std::runtime_error("len() expects 1 argument");
+        throw TypeError("len() expects 1 argument", location);
     }
 
     const Value &value = args[0];
@@ -34,5 +35,5 @@ Value LenBuiltin::func(const std::vector<Value> &args) const
         return static_cast<int>(dict->elements.size());
     }
 
-    throw std::runtime_error("Object has no len()");
+    throw TypeError("Object has no len()", location);
 }

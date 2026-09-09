@@ -2,10 +2,11 @@
 
 #include <string>
 #include <vector>
-
-#include "Token.h"
 #include <unordered_map>
 #include <optional>
+
+#include "Token.h"
+#include "Utils/SourceLocation.h"
 
 static const std::unordered_map<char, TokenType> simple_symbols = {
     {'+', TokenType::Plus},
@@ -75,4 +76,6 @@ private:
     std::optional<Token> tokenize_simple_symbol();
     std::optional<Token> tokenize_grouping_symbol();
     std::optional<Token> tokenize_comparing_symbol();
+
+    SourceLocation get_location() const;
 };

@@ -39,7 +39,7 @@ std::unique_ptr<Statement> StatementParser::parse_program()
         statements.push_back(statement());
     }
 
-    return std::make_unique<BlockStatement>(std::move(statements));
+    return std::make_unique<BlockStatement>(std::move(statements), get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::if_statement()
@@ -48,7 +48,7 @@ std::unique_ptr<Statement> StatementParser::if_statement()
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw SyntaxError("Expected ':' after 'if' condition", tokens.current());
+        throw SyntaxError("Expected ':' after 'if' condition", get_location());
     }
 
     auto then = block();
@@ -63,7 +63,7 @@ std::unique_ptr<Statement> StatementParser::if_statement()
     {
         if (!tokens.match(TokenType::Colon))
         {
-            throw SyntaxError("Expected ':' after else", tokens.current());
+            throw SyntaxError("Expected ':' after else", get_location());
         }
 
         else_branch = block();
@@ -72,6 +72,7 @@ std::unique_ptr<Statement> StatementParser::if_statement()
     return std::make_unique<IfStatement>(
         std::move(condition),
         std::move(then),
+        get_location(),
         std::move(else_branch));
 }
 
@@ -79,7 +80,7 @@ std::unique_ptr<Statement> StatementParser::for_statement()
 {
     if (!tokens.check(TokenType::Identifier))
     {
-        throw SyntaxError("Expected variable after 'for'", tokens.current());
+        throw SyntaxError("Expected variable after 'for'", get_location());
     }
 
     std::string variable = tokens.current().text;
@@ -88,14 +89,14 @@ std::unique_ptr<Statement> StatementParser::for_statement()
 
     if (!tokens.match(TokenType::In))
     {
-        throw SyntaxError("Expected 'in' after for variable", tokens.current());
+        throw SyntaxError("Expected 'in' after for variable", get_location());
     }
 
     auto iterable = expressions.parse();
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw SyntaxError("Expected ':' after for statement", tokens.current());
+        throw SyntaxError("Expected ':' after for statement", get_location());
     }
 
     auto body = block();
@@ -103,7 +104,8 @@ std::unique_ptr<Statement> StatementParser::for_statement()
     return std::make_unique<ForStatement>(
         variable,
         std::move(iterable),
-        std::move(body));
+        std::move(body),
+        get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::while_statement()
@@ -112,12 +114,12 @@ std::unique_ptr<Statement> StatementParser::while_statement()
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw SyntaxError("Expected ':' after 'while' condition", tokens.current());
+        throw SyntaxError("Expected ':' after 'while' condition", get_location());
     }
 
     auto body = block();
 
-    return std::make_unique<WhileStatement>(std::move(condition), std::move(body));
+    return std::make_unique<WhileStatement>(std::move(condition), std::move(body), get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::return_statement()
@@ -131,10 +133,10 @@ std::unique_ptr<Statement> StatementParser::return_statement()
 
     if (!tokens.match(TokenType::Newline))
     {
-        throw SyntaxError("Expected newline after return", tokens.current());
+        throw SyntaxError("Expected newline after return", get_location());
     }
 
-    return std::make_unique<ReturnStatement>(std::move(value));
+    return std::make_unique<ReturnStatement>(std::move(value), get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::simple_statement()
@@ -147,7 +149,7 @@ std::unique_ptr<Statement> StatementParser::simple_statement()
 
         auto value = expressions.parse();
 
-        return std::make_unique<AssignmentStatement>(name, std::move(value));
+        return std::make_unique<AssignmentStatement>(name, std::move(value), get_location());
     }
 
     // list[index] = expression
@@ -164,14 +166,14 @@ std::unique_ptr<Statement> StatementParser::simple_statement()
         tokens.set_position(saved_position);
     }
 
-    return std::make_unique<ExpressionStatement>(expressions.parse());
+    return std::make_unique<ExpressionStatement>(expressions.parse(), get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::function_statement()
 {
     if (!tokens.check(TokenType::Identifier))
     {
-        throw SyntaxError("Expected function name", tokens.current());
+        throw SyntaxError("Expected function name", get_location());
     }
 
     std::string name = tokens.current().text;
@@ -180,7 +182,7 @@ std::unique_ptr<Statement> StatementParser::function_statement()
 
     if (!tokens.match(TokenType::LeftParen))
     {
-        throw SyntaxError("Expected '(' after function name", tokens.current());
+        throw SyntaxError("Expected '(' after function name", get_location());
     }
 
     std::vector<std::string> parameters;
@@ -191,7 +193,7 @@ std::unique_ptr<Statement> StatementParser::function_statement()
         {
             if (!tokens.check(TokenType::Identifier))
             {
-                throw SyntaxError("Expected parameter name", tokens.current());
+                throw SyntaxError("Expected parameter name", get_location());
             }
 
             parameters.push_back(tokens.current().text);
@@ -202,12 +204,12 @@ std::unique_ptr<Statement> StatementParser::function_statement()
 
     if (!tokens.match(TokenType::RightParen))
     {
-        throw SyntaxError("Expected ')' after parameters", tokens.current());
+        throw SyntaxError("Expected ')' after parameters", get_location());
     }
 
     if (!tokens.match(TokenType::Colon))
     {
-        throw SyntaxError("Expected ':' after function declaration", tokens.current());
+        throw SyntaxError("Expected ':' after function declaration", get_location());
     }
 
     auto body = block();
@@ -215,7 +217,8 @@ std::unique_ptr<Statement> StatementParser::function_statement()
     return std::make_unique<FunctionStatement>(
         name,
         std::move(parameters),
-        std::move(body));
+        std::move(body),
+        get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::statement()
@@ -249,27 +252,27 @@ std::unique_ptr<Statement> StatementParser::statement()
     {
         if (!tokens.match(TokenType::Newline))
         {
-            throw SyntaxError("Expected newline after break", tokens.current());
+            throw SyntaxError("Expected newline after break", get_location());
         }
 
-        return std::make_unique<BreakStatement>();
+        return std::make_unique<BreakStatement>(get_location());
     }
 
     if (tokens.match(TokenType::Continue))
     {
         if (!tokens.match(TokenType::Newline))
         {
-            throw SyntaxError("Expected newline after continue", tokens.current());
+            throw SyntaxError("Expected newline after continue", get_location());
         }
 
-        return std::make_unique<ContinueStatement>();
+        return std::make_unique<ContinueStatement>(get_location());
     }
 
     auto stmt = simple_statement();
 
     if (!tokens.match(TokenType::Newline))
     {
-        throw SyntaxError("Expected newline after statement", tokens.current());
+        throw SyntaxError("Expected newline after statement", get_location());
     }
 
     return stmt;
@@ -279,7 +282,7 @@ std::unique_ptr<Statement> StatementParser::block()
 {
     if (!tokens.match(TokenType::Newline))
     {
-        throw SyntaxError("Expected newline before block", tokens.current());
+        throw SyntaxError("Expected newline before block", get_location());
     }
 
     while (tokens.match(TokenType::Newline))
@@ -289,7 +292,7 @@ std::unique_ptr<Statement> StatementParser::block()
 
     if (!tokens.match(TokenType::Indent))
     {
-        throw SyntaxError("Expected indented block", tokens.current());
+        throw SyntaxError("Expected indented block", get_location());
     }
 
     std::vector<std::unique_ptr<Statement>> statements;
@@ -306,10 +309,10 @@ std::unique_ptr<Statement> StatementParser::block()
 
     if (!tokens.match(TokenType::Dedent))
     {
-        throw SyntaxError("Expected dedent after block", tokens.current());
+        throw SyntaxError("Expected dedent after block", get_location());
     }
 
-    return std::make_unique<BlockStatement>(std::move(statements));
+    return std::make_unique<BlockStatement>(std::move(statements), get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::index_assignment()
@@ -327,7 +330,7 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 
     if (!tokens.match(TokenType::RightBracket))
     {
-        throw SyntaxError("Expected ']' after index", tokens.current());
+        throw SyntaxError("Expected ']' after index", get_location());
     }
 
     if (!tokens.match(TokenType::Equal))
@@ -337,5 +340,10 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 
     auto value = expressions.parse();
 
-    return std::make_unique<IndexAssignmentStatement>(name, std::move(index), std::move(value));
+    return std::make_unique<IndexAssignmentStatement>(name, std::move(index), std::move(value), get_location());
+}
+
+SourceLocation StatementParser::get_location() const
+{
+    return SourceLocation{tokens.current().line, tokens.current().column};
 }

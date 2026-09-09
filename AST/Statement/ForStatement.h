@@ -12,8 +12,8 @@
 class ForStatement : public Statement
 {
 public:
-    ForStatement(std::string variable, std::unique_ptr<Expression> iterable, std::unique_ptr<Statement> body)
-        : variable(std::move(variable)), iterable(std::move(iterable)), body(std::move(body))
+    ForStatement(std::string variable, std::unique_ptr<Expression> iterable, std::unique_ptr<Statement> body, SourceLocation location)
+        : variable(std::move(variable)), iterable(std::move(iterable)), body(std::move(body)), Statement(location)
     {
     }
 
@@ -21,7 +21,7 @@ public:
     {
         Value value = iterable->evaluate(env);
 
-        validate_alternative<std::shared_ptr<ListValue>>(value, "Object is not iterable");
+        validate_alternative<std::shared_ptr<ListValue>>(value, iterable->get_location(), "Object is not iterable");
 
         auto list = std::get<std::shared_ptr<ListValue>>(value);
 

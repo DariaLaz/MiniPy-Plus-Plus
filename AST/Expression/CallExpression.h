@@ -2,12 +2,13 @@
 
 #include "Expression.h"
 #include "signals/ReturnSignal.h"
+#include "Errors/TypeError.h"
 
 class CallExpression : public Expression
 {
 public:
-    CallExpression(std::unique_ptr<Expression> callee, std::vector<std::unique_ptr<Expression>> arguments)
-        : callee(std::move(callee)), arguments(std::move(arguments))
+    CallExpression(std::unique_ptr<Expression> callee, std::vector<std::unique_ptr<Expression>> arguments, SourceLocation location)
+        : Expression(location), callee(std::move(callee)), arguments(std::move(arguments))
     {
     }
 
@@ -28,7 +29,7 @@ public:
 
             if (arguments.size() != function->parameters.size())
             {
-                throw std::runtime_error("Wrong number of arguments");
+                throw TypeError("Wrong number of arguments", get_location());
             }
 
             auto local_env = std::make_shared<Environment>(function->closure);
@@ -53,10 +54,10 @@ public:
         if (std::holds_alternative<std::shared_ptr<BuildinFunctionValue>>(callee_value))
         {
             auto function = std::get<std::shared_ptr<BuildinFunctionValue>>(callee_value);
-            return function->function(argument_values);
+            return function->function(argument_values, get_location());
         }
 
-        throw std::runtime_error("Object is not callable");
+        throw TypeError("Object is not callable", get_location());
     }
 
 private:

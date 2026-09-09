@@ -6,6 +6,8 @@
 #include <vector>
 #include <functional>
 #include <stdexcept>
+#include "Utils/SourceLocation.h"
+#include "Errors/TypeError.h"
 
 class Statement;
 class Environment;
@@ -47,20 +49,20 @@ struct FunctionValue
 struct BuildinFunctionValue
 {
     std::string name;
-    std::function<Value(const std::vector<Value> &)> function;
+    std::function<Value(const std::vector<Value> &, const SourceLocation &)> function;
 };
 
-std::string value_to_string(const Value &value);
+std::string value_to_string(const Value &value, const SourceLocation &location);
 
 bool is_truthy(const Value &value);
 
-Value add(const Value &left, const Value &right);
+Value add(const Value &left, const Value &right, const SourceLocation &location);
 
 template <typename T>
-void validate_alternative(const Value &value, std::string message)
+void validate_alternative(const Value &value, const SourceLocation &location, const std::string &message)
 {
     if (!std::holds_alternative<T>(value))
     {
-        throw std::runtime_error(message);
+        throw TypeError(message, location);
     }
 }

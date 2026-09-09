@@ -1,11 +1,13 @@
 #include "Value.h"
+#include "Errors/TypeError.h"
+#include "Utils/SourceLocation.h"
 
 #include <iostream>
 #include <variant>
 #include <vector>
 #include <memory>
 
-std::string value_to_string(const Value &value)
+std::string value_to_string(const Value &value, const SourceLocation &location)
 {
     if (std::holds_alternative<std::monostate>(value))
     {
@@ -35,7 +37,7 @@ std::string value_to_string(const Value &value)
 
         for (std::size_t i = 0; i < list->elements.size(); ++i)
         {
-            result += value_to_string(list->elements[i]);
+            result += value_to_string(list->elements[i], location);
 
             if (i + 1 < list->elements.size())
             {
@@ -70,7 +72,7 @@ std::string value_to_string(const Value &value)
         {
             result += key;
             result += ": ";
-            result += value_to_string(val);
+            result += value_to_string(val, location);
 
             if (++i < dict->elements.size())
             {
@@ -83,7 +85,7 @@ std::string value_to_string(const Value &value)
         return result;
     }
 
-    throw std::runtime_error("Cannot convert value to string");
+    throw TypeError("Cannot convert value to string", location);
 }
 
 bool is_truthy(const Value &value)
@@ -117,7 +119,7 @@ bool is_truthy(const Value &value)
     return false;
 }
 
-Value add(const Value &left, const Value &right)
+Value add(const Value &left, const Value &right, const SourceLocation &location)
 {
     if (std::holds_alternative<int>(left) && std::holds_alternative<int>(right))
     {
@@ -129,6 +131,6 @@ Value add(const Value &left, const Value &right)
     }
     else
     {
-        throw std::runtime_error("Invalid operands for addition");
+        throw TypeError("Invalid operands for addition", location);
     }
 }

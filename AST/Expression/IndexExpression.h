@@ -6,12 +6,14 @@
 
 #include "AST/Expression/Expression.h"
 #include "AST/utils.h"
+#include "Errors/IndexError.h"
+#include "Errors/KeyError.h"
 
 class IndexExpression : public Expression
 {
 public:
-    IndexExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> index)
-        : object(std::move(object)), index(std::move(index))
+    IndexExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> index, SourceLocation location)
+        : Expression(location), object(std::move(object)), index(std::move(index))
     {
     }
 
@@ -22,7 +24,7 @@ public:
 
         if (std::holds_alternative<std::shared_ptr<DictValue>>(object_value))
         {
-            validate_alternative<std::string>(index_value, "Dict key must be a string");
+            validate_alternative<std::string>(index_value, index->get_location(), "Dict key must be a string");
 
             auto dict = std::get<std::shared_ptr<DictValue>>(object_value);
             auto &key = std::get<std::string>(index_value);
@@ -30,7 +32,7 @@ public:
             auto val = dict->elements.find(key);
             if (val == dict->elements.end())
             {
-                throw std::runtime_error("Dictionary key not found: " + key);
+                throw KeyError("Dictionary key not found: " + key, get_location());
             }
 
             return val->second;
@@ -40,7 +42,7 @@ public:
         {
             const auto &list = std::get<std::shared_ptr<ListValue>>(object_value);
 
-            validate_alternative<int>(index_value, "Index must be an integer");
+            validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
 
             int i = normalize_int_index(index_value, list->elements.size());
 
@@ -51,14 +53,14 @@ public:
         {
             const auto &str = std::get<std::string>(object_value);
 
-            validate_alternative<int>(index_value, "Index must be an integer");
+            validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
 
             int i = normalize_int_index(index_value, str.size());
 
             return std::string(1, str[i]);
         }
 
-        throw std::runtime_error("Object is not indexable");
+        throw IndexError("Object is not indexable", get_location());
     }
 
 private:

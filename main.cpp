@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
         Parser parser(tokens);
         std::unique_ptr<Statement> program = parser.parse();
 
-        Environment env;
-        install_builtins(env);
-        program->execute(env);
+        auto env = std::make_shared<Environment>();
+        install_builtins(*env);
+        program->execute(*env);
     }
     catch (const std::exception &e)
     {

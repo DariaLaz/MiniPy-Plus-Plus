@@ -31,16 +31,16 @@ public:
                 throw std::runtime_error("Wrong number of arguments");
             }
 
-            Environment local_env(function->closure);
+            auto local_env = std::make_shared<Environment>(function->closure);
 
             for (std::size_t i = 0; i < argument_values.size(); ++i)
             {
-                local_env.set(function->parameters[i], argument_values[i]);
+                local_env->set(function->parameters[i], argument_values[i]);
             }
 
             try
             {
-                function->body->execute(local_env);
+                function->body->execute(*local_env);
             }
             catch (const ReturnSignal &signal)
             {

@@ -6,10 +6,10 @@
 
 #include "Value.h"
 
-class Environment
+class Environment : public std::enable_shared_from_this<Environment>
 {
 public:
-    Environment(Environment *parent = nullptr) : parent(parent)
+    Environment(std::shared_ptr<Environment> parent = nullptr) : parent(std::move(parent))
     {
     }
 
@@ -37,5 +37,5 @@ public:
 
 private:
     std::unordered_map<std::string, Value> values;
-    Environment *parent;
+    std::shared_ptr<Environment> parent;
 };

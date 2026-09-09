@@ -22,7 +22,7 @@ public:
 
         function->parameters = parameters;
         function->body = body.get();
-        function->closure = &env;
+        function->closure = env.shared_from_this();
 
         env.set(name, function);
 

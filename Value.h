@@ -41,7 +41,7 @@ struct FunctionValue
 
     const Statement *body;
 
-    Environment *closure;
+    std::shared_ptr<Environment> closure;
 };
 
 struct BuildinFunctionValue

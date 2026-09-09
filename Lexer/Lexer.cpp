@@ -1,5 +1,6 @@
 #include "Lexer/Lexer.h"
 #include <stdexcept>
+#include <optional>
 
 Lexer::Lexer(const std::string &source) : source(source) {}
 
@@ -18,18 +19,20 @@ std::vector<Token> Lexer::tokenize()
                 break;
             }
         }
-        char curr_char = static_cast<unsigned char>(source[curr]);
+        token_start_line = line;
+        token_start_column = column;
+        auto curr_char = static_cast<unsigned char>(source[curr]);
 
         if (curr_char == '\n')
         {
-            curr++;
+            consume();
             if (grouping_depth > 0)
             {
                 // newline inside (), [] or {}
                 continue;
             }
 
-            tokens.push_back({TokenType::Newline, "\\n"});
+            tokens.push_back(make_token(TokenType::Newline, "\\n"));
 
             line_start = true;
             continue;
@@ -37,7 +40,7 @@ std::vector<Token> Lexer::tokenize()
 
         if (std::isspace(curr_char))
         {
-            curr++;
+            consume();
             continue;
         }
 
@@ -47,7 +50,7 @@ std::vector<Token> Lexer::tokenize()
             continue;
         }
 
-        if (is_identifier())
+        if (is_identifier_start())
         {
             tokens.push_back(tokenize_identifier_or_keyword());
             continue;
@@ -60,21 +63,20 @@ std::vector<Token> Lexer::tokenize()
         }
 
         tokens.push_back(tokenize_symbol());
-        curr++;
     }
 
     if (tokens.empty() || tokens.back().type != TokenType::Newline)
     {
-        tokens.push_back({TokenType::Newline, "\\n"});
+        tokens.push_back(make_token(TokenType::Newline, "\\n"));
     }
 
     while (indent_levels.size() > 1)
     {
         indent_levels.pop_back();
-        tokens.push_back({TokenType::Dedent, ""});
+        tokens.push_back(make_token(TokenType::Dedent, ""));
     }
 
-    tokens.push_back({TokenType::End, ""});
+    tokens.push_back(make_token(TokenType::End, ""));
 
     return tokens;
 }
@@ -84,113 +86,167 @@ Token Lexer::tokenize_number()
     std::string number = "";
     while (curr < source.size() && is_digit())
     {
-        number += source[curr];
-        curr++;
+        number += consume();
     }
 
-    return {TokenType::Number, number};
+    return make_token(TokenType::Number, number);
 }
 
 Token Lexer::tokenize_symbol()
 {
-    switch (static_cast<unsigned char>(source[curr]))
+    std::optional<Token> simple_symbol = tokenize_simple_symbol();
+    if (simple_symbol.has_value())
     {
-    case '+':
-        return {TokenType::Plus, "+"};
-    case '-':
-        return {TokenType::Minus, "-"};
-    case '*':
-        return {TokenType::Star, "*"};
-    case '/':
-        return {TokenType::Slash, "/"};
+        return simple_symbol.value();
+    }
+
+    std::optional<Token> grouping_symbol = tokenize_grouping_symbol();
+    if (grouping_symbol.has_value())
+    {
+        return grouping_symbol.value();
+    }
+
+    std::optional<Token> comparing_symbol = tokenize_comparing_symbol();
+    if (comparing_symbol.has_value())
+    {
+        return comparing_symbol.value();
+    }
+
+    throw std::runtime_error(std::string("Unexpected character: ") + source[curr]);
+}
+
+std::optional<Token> Lexer::tokenize_grouping_symbol()
+{
+    switch (source[curr])
+    {
     case '(':
         grouping_depth++;
-        return {TokenType::LeftParen, "("};
+        consume();
+        return make_token(TokenType::LeftParen, "(");
+
     case ')':
         grouping_depth--;
-        return {TokenType::RightParen, ")"};
+        consume();
+        return make_token(TokenType::RightParen, ")");
+
     case '[':
         grouping_depth++;
-        return {TokenType::LeftBracket, "["};
+        consume();
+        return make_token(TokenType::LeftBracket, "[");
+
     case ']':
         grouping_depth--;
-        return {TokenType::RightBracket, "]"};
+        consume();
+        return make_token(TokenType::RightBracket, "]");
+
     case '{':
         grouping_depth++;
-        return {TokenType::LeftBrace, "{"};
+        consume();
+        return make_token(TokenType::LeftBrace, "{");
+
     case '}':
         grouping_depth--;
-        return {TokenType::RightBrace, "}"};
-    case ',':
-        return {TokenType::Comma, ","};
-    case ':':
-        return {TokenType::Colon, ":"};
+        consume();
+        return make_token(TokenType::RightBrace, "}");
+    }
+
+    return std::nullopt;
+}
+
+std::optional<Token> Lexer::tokenize_comparing_symbol()
+{
+
+    switch (source[curr])
+    {
     case '=':
-        if (check_next('='))
+        consume();
+
+        if (curr < source.size() && source[curr] == '=')
         {
-            curr++;
-            return {TokenType::EqualEqual, "=="};
+            consume();
+            return make_token(TokenType::EqualEqual, "==");
         }
-        return {TokenType::Equal, "="};
+
+        return make_token(TokenType::Equal, "=");
 
     case '<':
-        if (check_next('='))
+        consume();
+
+        if (curr < source.size() && source[curr] == '=')
         {
-            curr++;
-            return {TokenType::LessEqual, "<="};
+            consume();
+            return make_token(TokenType::LessEqual, "<=");
         }
-        return {TokenType::Less, "<"};
+
+        return make_token(TokenType::Less, "<");
 
     case '>':
-        if (check_next('='))
+        consume();
+
+        if (curr < source.size() && source[curr] == '=')
         {
-            curr++;
-            return {TokenType::GreaterEqual, ">="};
+            consume();
+            return make_token(TokenType::GreaterEqual, ">=");
         }
-        return {TokenType::Greater, ">"};
+
+        return make_token(TokenType::Greater, ">");
 
     case '!':
-        if (check_next('='))
+        consume();
+
+        if (curr < source.size() && source[curr] == '=')
         {
-            curr++;
-            return {TokenType::NotEqual, "!="};
+            consume();
+            return make_token(TokenType::NotEqual, "!=");
         }
 
-    default:
-        throw std::runtime_error(
-            "Unexpected character: " + std::string(1, source[curr]));
+        throw std::runtime_error("Unexpected character: !");
     }
+
+    return std::nullopt;
+}
+
+std::optional<Token> Lexer::tokenize_simple_symbol()
+{
+    char ch = source[curr];
+
+    if (simple_symbols.find(ch) != simple_symbols.end())
+    {
+        consume();
+        return make_token(simple_symbols.at(ch), std::string(1, ch));
+    }
+
+    return std::nullopt;
 }
 
 Token Lexer::tokenize_identifier_or_keyword()
 {
     std::string identifier;
 
-    while (curr < source.size() && is_identifier())
+    while (curr < source.size() && is_identifier_part())
     {
-        identifier += source[curr];
-        curr++;
+        identifier += consume();
     }
 
     if (keyword_map.find(identifier) != keyword_map.end())
     {
-        return {keyword_map.at(identifier), identifier};
+        return make_token(keyword_map.at(identifier), identifier);
     }
 
-    return {TokenType::Identifier, identifier};
+    return make_token(TokenType::Identifier, identifier);
 }
 
 Token Lexer::tokenize_string()
 {
-    curr++;
+    consume();
     std::string value;
 
     while (curr < source.size())
     {
         if (source[curr] == '"')
         {
-            curr++;
-            return {TokenType::String, value};
+            consume();
+            return make_token(TokenType::String, value);
         }
 
         if (source[curr] == '\n')
@@ -200,7 +256,7 @@ Token Lexer::tokenize_string()
 
         if (source[curr] == '\\')
         {
-            curr++;
+            consume();
 
             if (curr >= source.size())
             {
@@ -231,21 +287,24 @@ Token Lexer::tokenize_string()
                 throw std::runtime_error("Unknown escape sequence");
             }
 
-            curr++;
+            consume();
             continue;
         }
 
-        value += source[curr];
-        curr++;
+        value += consume();
     }
 
     throw std::runtime_error("Unterminated string");
 }
 
-bool Lexer::is_identifier() const
+bool Lexer::is_identifier_start() const
 {
-    return std::isalpha(static_cast<unsigned char>(source[curr])) ||
-           source[curr] == '_';
+    return std::isalpha(source[curr]) || source[curr] == '_';
+}
+
+bool Lexer::is_identifier_part() const
+{
+    return std::isalnum(source[curr]) || source[curr] == '_';
 }
 
 bool Lexer::is_digit() const
@@ -259,6 +318,7 @@ bool Lexer::check_next(char ch) const
     {
         return false;
     }
+
     return source[curr + 1] == ch;
 }
 
@@ -269,7 +329,7 @@ void Lexer::handle_indentation(std::vector<Token> &tokens)
     while (curr < source.size() && source[curr] == ' ')
     {
         spaces++;
-        curr++;
+        consume();
     }
 
     if (curr < source.size() && source[curr] == '\t')
@@ -288,14 +348,14 @@ void Lexer::handle_indentation(std::vector<Token> &tokens)
     {
         indent_levels.push_back(spaces);
 
-        tokens.push_back({TokenType::Indent, ""});
+        tokens.push_back(make_token(TokenType::Indent, ""));
     }
     else if (spaces < current_indent)
     {
         while (indent_levels.size() > 1 && spaces < indent_levels.back())
         {
             indent_levels.pop_back();
-            tokens.push_back({TokenType::Dedent, ""});
+            tokens.push_back(make_token(TokenType::Dedent, ""));
         }
 
         if (spaces != indent_levels.back())
@@ -305,4 +365,28 @@ void Lexer::handle_indentation(std::vector<Token> &tokens)
     }
 
     line_start = false;
+}
+
+char Lexer::consume()
+{
+    char ch = source[curr];
+
+    curr++;
+
+    if (ch == '\n')
+    {
+        line++;
+        column = 1;
+    }
+    else
+    {
+        column++;
+    }
+
+    return ch;
+}
+
+Token Lexer::make_token(TokenType type, const std::string &text) const
+{
+    return Token{type, text, token_start_line, token_start_column};
 }

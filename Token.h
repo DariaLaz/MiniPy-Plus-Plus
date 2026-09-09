@@ -66,4 +66,7 @@ struct Token
 {
     TokenType type;
     std::string text;
+
+    int line = 0;
+    int column = 0;
 };

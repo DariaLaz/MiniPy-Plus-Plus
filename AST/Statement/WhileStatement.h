@@ -41,6 +41,11 @@ public:
         return std::nullopt;
     }
 
+    const Statement &get_body() const
+    {
+        return *body;
+    }
+
 private:
     std::unique_ptr<Expression> condition;
     std::unique_ptr<Statement> body;

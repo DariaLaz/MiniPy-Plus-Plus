@@ -281,6 +281,11 @@ std::unique_ptr<Statement> StatementParser::block()
         throw std::runtime_error("Expected newline before block");
     }
 
+    while (tokens.match(TokenType::Newline))
+    {
+        // Skip empty lines
+    }
+
     if (!tokens.match(TokenType::Indent))
     {
         throw std::runtime_error("Expected indented block");

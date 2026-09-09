@@ -29,6 +29,16 @@ public:
         return std::nullopt;
     }
 
+    const Statement &get_body() const
+    {
+        return *body;
+    }
+
+    const std::vector<std::string> &get_parameters() const
+    {
+        return parameters;
+    }
+
 private:
     std::string name;
     std::vector<std::string> parameters;

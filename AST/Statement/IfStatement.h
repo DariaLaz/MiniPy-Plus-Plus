@@ -37,9 +37,18 @@ public:
         return std::nullopt;
     }
 
+    const Statement &get_then() const
+    {
+        return *then;
+    }
+
+    const Statement *get_else_branch() const
+    {
+        return else_branch.get();
+    }
+
 private:
     std::unique_ptr<Expression> condition;
     std::unique_ptr<Statement> then;
-    std::vector<std::unique_ptr<Statement>> elifs;
     std::unique_ptr<Statement> else_branch;
 };

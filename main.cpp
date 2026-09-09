@@ -8,6 +8,7 @@
 #include "Parser/Parser.h"
 #include "AST/Environment.h"
 #include "Builtins/utils.h"
+#include "Semantic/SemanticAnalyzer.h"
 
 std::string read_file(const std::string &filename)
 {
@@ -42,6 +43,9 @@ int main(int argc, char *argv[])
 
         Parser parser(tokens);
         std::unique_ptr<Statement> program = parser.parse();
+
+        SemanticAnalyzer analyzer;
+        analyzer.analyze(*program);
 
         auto env = std::make_shared<Environment>();
         install_builtins(*env);

@@ -45,6 +45,11 @@ public:
         return std::nullopt;
     }
 
+    const Statement &get_body() const
+    {
+        return *body;
+    }
+
 private:
     std::string variable;
     std::unique_ptr<Expression> iterable;

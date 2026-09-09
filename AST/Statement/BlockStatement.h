@@ -33,6 +33,11 @@ public:
         return result;
     }
 
+    const std::vector<std::unique_ptr<Statement>> &get_statements() const
+    {
+        return statements;
+    }
+
 private:
     std::vector<std::unique_ptr<Statement>> statements;
 };

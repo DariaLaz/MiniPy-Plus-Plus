@@ -13,8 +13,7 @@ class FunctionStatement : public Statement
 public:
   FunctionStatement(std::string name, std::vector<std::string> parameters,
                     std::unique_ptr<Statement> body, SourceLocation location)
-      : name(std::move(name)), parameters(std::move(parameters)), body(std::move(body)),
-        Statement(location)
+      : Statement(location), name(std::move(name)), parameters(std::move(parameters)), body(std::move(body))
   {
   }
 

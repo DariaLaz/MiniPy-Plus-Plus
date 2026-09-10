@@ -14,7 +14,7 @@ public:
     using Entry = std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>;
 
     DictExpression(std::vector<Entry> entries, const SourceLocation &location)
-        : entries(std::move(entries)), Expression(location)
+        : Expression(location), entries(std::move(entries))
     {
     }
 

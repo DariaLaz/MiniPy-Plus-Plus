@@ -12,8 +12,7 @@ class LogicalExpression : public Expression
 {
 public:
     LogicalExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right)),
-          Expression({op.line, op.column})
+        : Expression({op.line, op.column}), left(std::move(left)), op(std::move(op)), right(std::move(right))
     {
     }
 

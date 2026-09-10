@@ -16,8 +16,7 @@ class IndexAssignmentStatement : public Statement
 public:
     IndexAssignmentStatement(std::string object_name, std::unique_ptr<Expression> index,
                              std::unique_ptr<Expression> value, SourceLocation location)
-        : object_name(std::move(object_name)), index(std::move(index)), value(std::move(value)),
-          Statement(location)
+        : Statement(location), object_name(std::move(object_name)), index(std::move(index)), value(std::move(value))
     {
     }
 

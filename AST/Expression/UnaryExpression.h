@@ -13,7 +13,7 @@ public:
     std::unique_ptr<Expression> expr;
 
     UnaryExpression(Token op, std::unique_ptr<Expression> expr)
-        : op(std::move(op)), expr(std::move(expr)), Expression({op.line, op.column})
+        : Expression({op.line, op.column}), op(std::move(op)), expr(std::move(expr))
     {
     }
 

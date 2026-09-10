@@ -2,7 +2,7 @@
 
 #include "Errors/TypeError.h"
 #include "Expression.h"
-#include "signals/ReturnSignal.h"
+#include "Signals/ReturnSignal.h"
 
 class CallExpression : public Expression
 {

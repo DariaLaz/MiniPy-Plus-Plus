@@ -63,7 +63,7 @@ void TokenStream::set_position(int position)
     curr = position;
 }
 
-int TokenStream::increment(int i = 1)
+int TokenStream::increment(int i)
 {
     return curr += i;
 }

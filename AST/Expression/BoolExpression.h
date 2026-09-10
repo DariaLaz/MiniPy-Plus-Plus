@@ -5,11 +5,11 @@
 class BoolExpression : public Expression
 {
 public:
-  BoolExpression(bool value, const SourceLocation &location) : value(value), Expression(location)
+  BoolExpression(bool value, const SourceLocation &location) : Expression(location), value(value)
   {
   }
 
-  Value evaluate(Environment &env) const override
+  Value evaluate(Environment &) const override
   {
     return value;
   }

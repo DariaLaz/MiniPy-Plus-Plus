@@ -6,11 +6,11 @@ class NumberExpression : public Expression
 public:
   int value;
 
-  NumberExpression(int value, const SourceLocation &location) : value(value), Expression(location)
+  NumberExpression(int value, const SourceLocation &location) : Expression(location), value(value)
   {
   }
 
-  Value evaluate(Environment &env) const override
+  Value evaluate(Environment &) const override
   {
     return value;
   }

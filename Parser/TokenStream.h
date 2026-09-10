@@ -24,6 +24,6 @@ public:
   void set_position(int pos);
 
 private:
-  int curr = 0;
+  std::size_t curr = 0;
   const std::vector<Token> &tokens;
 };

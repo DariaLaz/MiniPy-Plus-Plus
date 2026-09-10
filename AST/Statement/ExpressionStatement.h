@@ -1,24 +1,23 @@
+#include "AST/Expression/Expression.h"
+#include "AST/Statement/Statement.h"
+
 #include <memory>
 #include <optional>
 #include <string>
 
-#include "AST/Statement/Statement.h"
-#include "AST/Expression/Expression.h"
-
 class ExpressionStatement : public Statement
 {
 public:
-    ExpressionStatement(
-        std::unique_ptr<Expression> expression, SourceLocation location)
-        : expression(std::move(expression)), Statement(location)
-    {
-    }
+  ExpressionStatement(std::unique_ptr<Expression> expression, SourceLocation location)
+      : expression(std::move(expression)), Statement(location)
+  {
+  }
 
-    std::optional<Value> execute(Environment &env) const override
-    {
-        return expression->evaluate(env);
-    }
+  std::optional<Value> execute(Environment &env) const override
+  {
+    return expression->evaluate(env);
+  }
 
 private:
-    std::unique_ptr<Expression> expression;
+  std::unique_ptr<Expression> expression;
 };

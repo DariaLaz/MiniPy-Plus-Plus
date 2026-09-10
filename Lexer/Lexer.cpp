@@ -1,9 +1,41 @@
 #include "Lexer/Lexer.h"
-#include "Errors/SyntaxError.h"
-#include "Errors/IndentationError.h"
 
-#include <stdexcept>
+#include "Errors/IndentationError.h"
+#include "Errors/SyntaxError.h"
+
 #include <optional>
+#include <stdexcept>
+
+namespace
+{
+    const std::unordered_map<char, TokenType> simple_symbols = {
+        {'+', TokenType::Plus},
+        {'-', TokenType::Minus},
+        {'*', TokenType::Star},
+        {'/', TokenType::Slash},
+        {',', TokenType::Comma},
+        {':', TokenType::Colon},
+    };
+
+    const std::unordered_map<std::string, TokenType> keyword_map = {
+        {"if", TokenType::If},
+        {"elif", TokenType::Elif},
+        {"else", TokenType::Else},
+        {"True", TokenType::True},
+        {"False", TokenType::False},
+        {"while", TokenType::While},
+        {"for", TokenType::For},
+        {"in", TokenType::In},
+        {"def", TokenType::Def},
+        {"return", TokenType::Return},
+        {"break", TokenType::Break},
+        {"continue", TokenType::Continue},
+        {"and", TokenType::And},
+        {"or", TokenType::Or},
+        {"not", TokenType::Not},
+        {"None", TokenType::None},
+    };
+} // namespace
 
 Lexer::Lexer(const std::string &source) : source(source) {}
 

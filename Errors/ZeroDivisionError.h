@@ -5,8 +5,8 @@
 class ZeroDivisionError : public Error
 {
 public:
-    ZeroDivisionError(const std::string &message, const SourceLocation &location)
-        : Error("ZeroDivisionError", message, location)
-    {
-    }
+  ZeroDivisionError(const std::string &message, const SourceLocation &location)
+      : Error("ZeroDivisionError", message, location)
+  {
+  }
 };

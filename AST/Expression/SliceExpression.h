@@ -1,18 +1,20 @@
 #pragma once
 
+#include "AST/Expression/Expression.h"
+#include "Runtime/Value.h"
+
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <string>
 
-#include "AST/Expression/Expression.h"
-#include "Value.h"
-
 class SliceExpression : public Expression
 {
 public:
-    SliceExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> start, std::unique_ptr<Expression> end, const SourceLocation &location)
-        : object(std::move(object)), start(std::move(start)), end(std::move(end)), Expression(location)
+    SliceExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> start,
+                    std::unique_ptr<Expression> end, const SourceLocation &location)
+        : object(std::move(object)), start(std::move(start)), end(std::move(end)),
+          Expression(location)
     {
     }
 
@@ -70,7 +72,8 @@ private:
 
         Value value = expression->evaluate(env);
 
-        validate_alternative<int>(value, expression->get_location(), "Slice indices must be integers");
+        validate_alternative<int>(value, expression->get_location(),
+                                  "Slice indices must be integers");
 
         return std::get<int>(value);
     }

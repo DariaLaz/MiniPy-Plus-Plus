@@ -1,12 +1,10 @@
+#include "Parser/TokenStream.h"
+
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include "Parser/TokenStream.h"
-
-TokenStream::TokenStream(const std::vector<Token> &tokens) : tokens(tokens)
-{
-}
+TokenStream::TokenStream(const std::vector<Token> &tokens) : tokens(tokens) {}
 
 const Token &TokenStream::current() const
 {
@@ -63,4 +61,9 @@ int TokenStream::position() const
 void TokenStream::set_position(int position)
 {
     curr = position;
+}
+
+int TokenStream::increment(int i = 1)
+{
+    return curr += i;
 }

@@ -1,10 +1,10 @@
 #pragma once
 
+#include "AST/Expression/Expression.h"
+#include "Lexer/Token.h"
+
 #include <memory>
 #include <stdexcept>
-
-#include "AST/Expression/Expression.h"
-#include "Token.h"
 
 class UnaryExpression : public Expression
 {
@@ -24,7 +24,8 @@ public:
         switch (op.type)
         {
         case TokenType::Minus:
-            validate_alternative<int>(value, get_location(), "Bad operand type for unary for '" + op.text + "'");
+            validate_alternative<int>(value, get_location(),
+                                      "Bad operand type for unary for '" + op.text + "'");
             return -std::get<int>(value);
 
         case TokenType::Plus:

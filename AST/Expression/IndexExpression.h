@@ -1,18 +1,19 @@
 #pragma once
 
+#include "AST/Expression/Expression.h"
+#include "AST/utils.h"
+#include "Errors/KeyError.h"
+#include "Errors/TypeError.h"
+
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include "AST/Expression/Expression.h"
-#include "AST/utils.h"
-#include "Errors/TypeError.h"
-#include "Errors/KeyError.h"
-
 class IndexExpression : public Expression
 {
 public:
-    IndexExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> index, SourceLocation location)
+    IndexExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> index,
+                    SourceLocation location)
         : Expression(location), object(std::move(object)), index(std::move(index))
     {
     }
@@ -24,7 +25,8 @@ public:
 
         if (std::holds_alternative<std::shared_ptr<DictValue>>(object_value))
         {
-            validate_alternative<std::string>(index_value, index->get_location(), "Dict key must be a string");
+            validate_alternative<std::string>(index_value, index->get_location(),
+                                              "Dict key must be a string");
 
             auto dict = std::get<std::shared_ptr<DictValue>>(object_value);
             auto &key = std::get<std::string>(index_value);
@@ -42,7 +44,8 @@ public:
         {
             const auto &list = std::get<std::shared_ptr<ListValue>>(object_value);
 
-            validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
+            validate_alternative<int>(index_value, index->get_location(),
+                                      "Index must be an integer");
 
             int i = normalize_int_index(index_value, list->elements.size(), get_location());
 
@@ -53,7 +56,8 @@ public:
         {
             const auto &str = std::get<std::string>(object_value);
 
-            validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
+            validate_alternative<int>(index_value, index->get_location(),
+                                      "Index must be an integer");
 
             int i = normalize_int_index(index_value, str.size(), get_location());
 

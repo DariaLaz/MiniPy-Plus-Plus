@@ -5,8 +5,8 @@
 class NameError : public Error
 {
 public:
-    NameError(const std::string &message, const SourceLocation &location)
-        : Error("NameError", message, location)
-    {
-    }
+  NameError(const std::string &message, const SourceLocation &location)
+      : Error("NameError", message, location)
+  {
+  }
 };

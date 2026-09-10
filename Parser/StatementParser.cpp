@@ -1,27 +1,25 @@
+#include "Parser/StatementParser.h"
+
+#include "AST/Statement/AssignmentStatement.h"
+#include "AST/Statement/BlockStatement.h"
+#include "AST/Statement/BreakStatement.h"
+#include "AST/Statement/ContinueStatement.h"
+#include "AST/Statement/ExpressionStatement.h"
+#include "AST/Statement/ForStatement.h"
+#include "AST/Statement/FunctionStatement.h"
+#include "AST/Statement/IfStatement.h"
+#include "AST/Statement/IndexAssignmentStatement.h"
+#include "AST/Statement/ReturnStatement.h"
+#include "AST/Statement/WhileStatement.h"
+#include "Errors/SyntaxError.h"
+#include "Parser/ExpressionParser.h"
+
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include "Parser/ExpressionParser.h"
-#include "Parser/StatementParser.h"
-#include "AST/Statement/AssignmentStatement.h"
-#include "AST/Statement/BlockStatement.h"
-#include "AST/Statement/ExpressionStatement.h"
-#include "AST/Statement/IfStatement.h"
-#include "AST/Statement/WhileStatement.h"
-#include "AST/Statement/ForStatement.h"
-#include "AST/Statement/FunctionStatement.h"
-#include "AST/Statement/ReturnStatement.h"
-#include "AST/Statement/BreakStatement.h"
-#include "AST/Statement/ContinueStatement.h"
-#include "AST/Statement/IndexAssignmentStatement.h"
-#include "Errors/SyntaxError.h"
-
-StatementParser::StatementParser(
-    TokenStream &tokens,
-    ExpressionParser &expressions)
-    : tokens(tokens),
-      expressions(expressions)
+StatementParser::StatementParser(TokenStream &tokens, ExpressionParser &expressions)
+    : tokens(tokens), expressions(expressions)
 {
 }
 
@@ -69,11 +67,8 @@ std::unique_ptr<Statement> StatementParser::if_statement()
         else_branch = block();
     }
 
-    return std::make_unique<IfStatement>(
-        std::move(condition),
-        std::move(then),
-        get_location(),
-        std::move(else_branch));
+    return std::make_unique<IfStatement>(std::move(condition), std::move(then), get_location(),
+                                         std::move(else_branch));
 }
 
 std::unique_ptr<Statement> StatementParser::for_statement()
@@ -101,11 +96,8 @@ std::unique_ptr<Statement> StatementParser::for_statement()
 
     auto body = block();
 
-    return std::make_unique<ForStatement>(
-        variable,
-        std::move(iterable),
-        std::move(body),
-        get_location());
+    return std::make_unique<ForStatement>(variable, std::move(iterable), std::move(body),
+                                          get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::while_statement()
@@ -207,11 +199,8 @@ std::unique_ptr<Statement> StatementParser::function_statement()
 
     auto body = block();
 
-    return std::make_unique<FunctionStatement>(
-        name,
-        std::move(parameters),
-        std::move(body),
-        get_location());
+    return std::make_unique<FunctionStatement>(name, std::move(parameters), std::move(body),
+                                               get_location());
 }
 
 std::unique_ptr<Statement> StatementParser::statement()
@@ -370,7 +359,8 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 
     auto value = expressions.parse();
 
-    return std::make_unique<IndexAssignmentStatement>(name, std::move(index), std::move(value), get_location());
+    return std::make_unique<IndexAssignmentStatement>(name, std::move(index), std::move(value),
+                                                      get_location());
 }
 
 SourceLocation StatementParser::get_location() const

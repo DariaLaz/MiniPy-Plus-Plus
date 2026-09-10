@@ -6,7 +6,7 @@
 
 #include "Lexer/Lexer.h"
 #include "Parser/Parser.h"
-#include "AST/Environment.h"
+#include "Runtime/Environment.h"
 #include "Builtins/utils.h"
 #include "Semantic/SemanticAnalyzer.h"
 

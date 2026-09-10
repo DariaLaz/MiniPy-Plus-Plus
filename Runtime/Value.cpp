@@ -1,11 +1,12 @@
-#include "Value.h"
+#include "Runtime/Value.h"
+
 #include "Errors/TypeError.h"
 #include "Utils/SourceLocation.h"
 
 #include <iostream>
+#include <memory>
 #include <variant>
 #include <vector>
-#include <memory>
 
 std::string value_to_string(const Value &value, const SourceLocation &location)
 {
@@ -55,7 +56,7 @@ std::string value_to_string(const Value &value, const SourceLocation &location)
         return "<function>";
     }
 
-    if (std::holds_alternative<std::shared_ptr<BuildinFunctionValue>>(value))
+    if (std::holds_alternative<std::shared_ptr<BuiltinFunctionValue>>(value))
     {
         return "<built-in function>";
     }
@@ -125,7 +126,8 @@ Value add(const Value &left, const Value &right, const SourceLocation &location)
     {
         return std::get<int>(left) + std::get<int>(right);
     }
-    else if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right))
+    else if (std::holds_alternative<std::string>(left) &&
+             std::holds_alternative<std::string>(right))
     {
         return std::get<std::string>(left) + std::get<std::string>(right);
     }

@@ -1,22 +1,23 @@
+#include "Parser/ExpressionParser.h"
+
+#include "AST/Expression/BinaryExpression.h"
+#include "AST/Expression/BoolExpression.h"
+#include "AST/Expression/CallExpression.h"
+#include "AST/Expression/DictExpression.h"
+#include "AST/Expression/IndexExpression.h"
+#include "AST/Expression/ListExpression.h"
+#include "AST/Expression/LogicalExpression.h"
+#include "AST/Expression/NoneExpression.h"
+#include "AST/Expression/NumberExpression.h"
+#include "AST/Expression/SliceExpression.h"
+#include "AST/Expression/StringExpression.h"
+#include "AST/Expression/UnaryExpression.h"
+#include "AST/Expression/VariableExpression.h"
+#include "Errors/SyntaxError.h"
+
 #include <stdexcept>
 #include <string>
 #include <utility>
-
-#include "Parser/ExpressionParser.h"
-#include "AST/Expression/BinaryExpression.h"
-#include "AST/Expression/BoolExpression.h"
-#include "AST/Expression/NumberExpression.h"
-#include "AST/Expression/UnaryExpression.h"
-#include "AST/Expression/VariableExpression.h"
-#include "AST/Expression/StringExpression.h"
-#include "AST/Expression/ListExpression.h"
-#include "AST/Expression/IndexExpression.h"
-#include "AST/Expression/CallExpression.h"
-#include "AST/Expression/LogicalExpression.h"
-#include "AST/Expression/NoneExpression.h"
-#include "AST/Expression/SliceExpression.h"
-#include "AST/Expression/DictExpression.h"
-#include "Errors/SyntaxError.h"
 
 std::unique_ptr<Expression> ExpressionParser::parse()
 {
@@ -27,7 +28,8 @@ std::unique_ptr<Expression> ExpressionParser::primary()
 {
     if (tokens.match(TokenType::Number))
     {
-        return std::make_unique<NumberExpression>(std::stoi(tokens.prev().text), get_prev_location());
+        return std::make_unique<NumberExpression>(std::stoi(tokens.prev().text),
+                                                  get_prev_location());
     }
 
     if (tokens.match(TokenType::Identifier))
@@ -167,7 +169,8 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
                     throw SyntaxError("Expected ']' after slice", get_location());
                 }
 
-                expr = std::make_unique<SliceExpression>(std::move(expr), std::move(first), std::move(end), location);
+                expr = std::make_unique<SliceExpression>(std::move(expr), std::move(first),
+                                                         std::move(end), location);
             }
 
             else
@@ -182,7 +185,8 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
                     throw SyntaxError("Expected ']' after index", get_location());
                 }
 
-                expr = std::make_unique<IndexExpression>(std::move(expr), std::move(first), location);
+                expr =
+                    std::make_unique<IndexExpression>(std::move(expr), std::move(first), location);
             }
         }
         else if (tokens.match(TokenType::LeftParen))
@@ -204,7 +208,8 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
                 throw SyntaxError("Expected ')' after arguments", get_location());
             }
 
-            expr = std::make_unique<CallExpression>(std::move(expr), std::move(arguments), location);
+            expr =
+                std::make_unique<CallExpression>(std::move(expr), std::move(arguments), location);
         }
         else
         {
@@ -231,22 +236,27 @@ std::unique_ptr<Expression> ExpressionParser::unary()
 
 std::unique_ptr<Expression> ExpressionParser::factor()
 {
-    return binary_expr<BinaryExpression>(&ExpressionParser::unary, {TokenType::Star, TokenType::Slash});
+    return binary_expr<BinaryExpression>(&ExpressionParser::unary,
+                                         {TokenType::Star, TokenType::Slash});
 }
 
 std::unique_ptr<Expression> ExpressionParser::term()
 {
-    return binary_expr<BinaryExpression>(&ExpressionParser::factor, {TokenType::Plus, TokenType::Minus});
+    return binary_expr<BinaryExpression>(&ExpressionParser::factor,
+                                         {TokenType::Plus, TokenType::Minus});
 }
 
 std::unique_ptr<Expression> ExpressionParser::comparison()
 {
-    return binary_expr<BinaryExpression>(&ExpressionParser::term, {TokenType::Less, TokenType::LessEqual, TokenType::Greater, TokenType::GreaterEqual});
+    return binary_expr<BinaryExpression>(
+        &ExpressionParser::term,
+        {TokenType::Less, TokenType::LessEqual, TokenType::Greater, TokenType::GreaterEqual});
 }
 
 std::unique_ptr<Expression> ExpressionParser::equality()
 {
-    return binary_expr<BinaryExpression>(&ExpressionParser::comparison, {TokenType::EqualEqual, TokenType::NotEqual});
+    return binary_expr<BinaryExpression>(&ExpressionParser::comparison,
+                                         {TokenType::EqualEqual, TokenType::NotEqual});
 }
 
 std::unique_ptr<Expression> ExpressionParser::not_expression()
@@ -264,14 +274,12 @@ std::unique_ptr<Expression> ExpressionParser::not_expression()
     return equality();
 }
 
-std::unique_ptr<Expression>
-ExpressionParser::and_expression()
+std::unique_ptr<Expression> ExpressionParser::and_expression()
 {
     return binary_expr<LogicalExpression>(&ExpressionParser::not_expression, {TokenType::And});
 }
 
-std::unique_ptr<Expression>
-ExpressionParser::or_expression()
+std::unique_ptr<Expression> ExpressionParser::or_expression()
 {
     return binary_expr<LogicalExpression>(&ExpressionParser::and_expression, {TokenType::Or});
 }
@@ -282,9 +290,9 @@ std::unique_ptr<Expression> ExpressionParser::expression()
 }
 
 template <typename T>
-std::unique_ptr<Expression> ExpressionParser::binary_expr(
-    std::unique_ptr<Expression> (ExpressionParser::*expr)(),
-    std::initializer_list<TokenType> types)
+std::unique_ptr<Expression>
+ExpressionParser::binary_expr(std::unique_ptr<Expression> (ExpressionParser::*expr)(),
+                              std::initializer_list<TokenType> types)
 {
     auto left = (this->*expr)();
 
@@ -295,10 +303,7 @@ std::unique_ptr<Expression> ExpressionParser::binary_expr(
 
         auto right = (this->*expr)();
 
-        left = std::make_unique<T>(
-            std::move(left),
-            op,
-            std::move(right));
+        left = std::make_unique<T>(std::move(left), op, std::move(right));
     }
 
     return left;

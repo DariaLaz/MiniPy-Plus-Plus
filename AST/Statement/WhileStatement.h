@@ -1,20 +1,19 @@
 #pragma once
 
-#include <memory>
-#include <optional>
-
 #include "AST/Expression/Expression.h"
 #include "AST/Statement/Statement.h"
-#include "Value.h"
-#include <signals/ContinueSignal.h>
+#include "Runtime/Value.h"
+
+#include <memory>
+#include <optional>
 #include <signals/BreakSignal.h>
+#include <signals/ContinueSignal.h>
 
 class WhileStatement : public Statement
 {
 public:
-    WhileStatement(
-        std::unique_ptr<Expression> condition,
-        std::unique_ptr<Statement> body, SourceLocation location)
+    WhileStatement(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> body,
+                   SourceLocation location)
         : condition(std::move(condition)), body(std::move(body)), Statement(location)
     {
     }

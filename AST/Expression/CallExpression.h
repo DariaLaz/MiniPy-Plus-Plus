@@ -1,13 +1,14 @@
 #pragma once
 
+#include "Errors/TypeError.h"
 #include "Expression.h"
 #include "signals/ReturnSignal.h"
-#include "Errors/TypeError.h"
 
 class CallExpression : public Expression
 {
 public:
-    CallExpression(std::unique_ptr<Expression> callee, std::vector<std::unique_ptr<Expression>> arguments, SourceLocation location)
+    CallExpression(std::unique_ptr<Expression> callee,
+                   std::vector<std::unique_ptr<Expression>> arguments, SourceLocation location)
         : Expression(location), callee(std::move(callee)), arguments(std::move(arguments))
     {
     }
@@ -51,9 +52,9 @@ public:
             return std::monostate{};
         }
 
-        if (std::holds_alternative<std::shared_ptr<BuildinFunctionValue>>(callee_value))
+        if (std::holds_alternative<std::shared_ptr<BuiltinFunctionValue>>(callee_value))
         {
-            auto function = std::get<std::shared_ptr<BuildinFunctionValue>>(callee_value);
+            auto function = std::get<std::shared_ptr<BuiltinFunctionValue>>(callee_value);
             return function->function(argument_values, get_location());
         }
 

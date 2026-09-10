@@ -1,21 +1,23 @@
 #pragma once
 
+#include "AST/Expression/Expression.h"
+#include "AST/Statement/Statement.h"
+#include "AST/utils.h"
+#include "Errors/TypeError.h"
+#include "Runtime/Environment.h"
+#include "Runtime/Value.h"
+
 #include <memory>
 #include <stdexcept>
 #include <string>
 
-#include "AST/Statement/Statement.h"
-#include "AST/Expression/Expression.h"
-#include "AST/Environment.h"
-#include "Errors/TypeError.h"
-#include "Value.h"
-#include "AST/utils.h"
-
 class IndexAssignmentStatement : public Statement
 {
 public:
-    IndexAssignmentStatement(std::string object_name, std::unique_ptr<Expression> index, std::unique_ptr<Expression> value, SourceLocation location)
-        : object_name(std::move(object_name)), index(std::move(index)), value(std::move(value)), Statement(location)
+    IndexAssignmentStatement(std::string object_name, std::unique_ptr<Expression> index,
+                             std::unique_ptr<Expression> value, SourceLocation location)
+        : object_name(std::move(object_name)), index(std::move(index)), value(std::move(value)),
+          Statement(location)
     {
     }
 
@@ -29,7 +31,8 @@ public:
 
             auto &list = std::get<std::shared_ptr<ListValue>>(object_value);
 
-            validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
+            validate_alternative<int>(index_value, index->get_location(),
+                                      "Index must be an integer");
 
             int i = normalize_int_index(index_value, list->elements.size(), get_location());
 
@@ -45,7 +48,8 @@ public:
 
         if (std::holds_alternative<std::shared_ptr<DictValue>>(object_value))
         {
-            validate_alternative<std::string>(index_value, index->get_location(), "Dict key must be a string");
+            validate_alternative<std::string>(index_value, index->get_location(),
+                                              "Dict key must be a string");
 
             auto dict = std::get<std::shared_ptr<DictValue>>(object_value);
 

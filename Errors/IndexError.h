@@ -5,8 +5,8 @@
 class IndexError : public Error
 {
 public:
-    IndexError(const std::string &message, const SourceLocation &location)
-        : Error("IndexError", message, location)
-    {
-    }
+  IndexError(const std::string &message, const SourceLocation &location)
+      : Error("IndexError", message, location)
+  {
+  }
 };

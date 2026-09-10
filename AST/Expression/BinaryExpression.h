@@ -1,22 +1,17 @@
 #pragma once
 
-#include <memory>
-
 #include "AST/Expression/Expression.h"
-#include "Token.h"
-#include "Errors/ZeroDivisionError.h"
 #include "Errors/TypeError.h"
+#include "Errors/ZeroDivisionError.h"
+#include "Lexer/Token.h"
+
+#include <memory>
 
 class BinaryExpression : public Expression
 {
 public:
-    BinaryExpression(
-        std::unique_ptr<Expression> left,
-        Token op,
-        std::unique_ptr<Expression> right)
-        : Expression({op.line, op.column}),
-          left(std::move(left)),
-          op(std::move(op)),
+    BinaryExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
+        : Expression({op.line, op.column}), left(std::move(left)), op(std::move(op)),
           right(std::move(right))
     {
     }

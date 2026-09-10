@@ -4,13 +4,14 @@
 class NumberExpression : public Expression
 {
 public:
-    int value;
+  int value;
 
-    NumberExpression(int value, const SourceLocation &location)
-        : value(value), Expression(location) {}
+  NumberExpression(int value, const SourceLocation &location) : value(value), Expression(location)
+  {
+  }
 
-    Value evaluate(Environment &env) const override
-    {
-        return value;
-    }
+  Value evaluate(Environment &env) const override
+  {
+    return value;
+  }
 };

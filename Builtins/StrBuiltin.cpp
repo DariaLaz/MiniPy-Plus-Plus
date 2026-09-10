@@ -1,4 +1,5 @@
 #include "Builtins/StrBuiltin.h"
+
 #include "Errors/TypeError.h"
 
 #include <stdexcept>

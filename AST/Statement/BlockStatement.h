@@ -1,17 +1,16 @@
 #pragma once
 
+#include "AST/Statement/Statement.h"
+
 #include <memory>
 #include <optional>
 #include <utility>
 #include <vector>
 
-#include "AST/Statement/Statement.h"
-
 class BlockStatement : public Statement
 {
 public:
-    BlockStatement(
-        std::vector<std::unique_ptr<Statement>> statements, SourceLocation location)
+    BlockStatement(std::vector<std::unique_ptr<Statement>> statements, SourceLocation location)
         : statements(std::move(statements)), Statement(location)
     {
     }

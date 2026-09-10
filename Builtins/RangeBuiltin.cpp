@@ -1,6 +1,7 @@
 #include "Builtins/RangeBuiltin.h"
-#include "Errors/ValueError.h"
+
 #include "Errors/TypeError.h"
+#include "Errors/ValueError.h"
 
 std::string RangeBuiltin::name() const
 {

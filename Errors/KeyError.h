@@ -5,8 +5,8 @@
 class KeyError : public Error
 {
 public:
-    KeyError(const std::string &message, const SourceLocation &location)
-        : Error("KeyError", message, location)
-    {
-    }
+  KeyError(const std::string &message, const SourceLocation &location)
+      : Error("KeyError", message, location)
+  {
+  }
 };

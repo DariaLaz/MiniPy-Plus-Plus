@@ -1,17 +1,17 @@
 #include "Semantic/SemanticAnalyzer.h"
 
-#include <stdexcept>
-#include <unordered_set>
-
 #include "AST/Statement/BlockStatement.h"
-#include "AST/Statement/IfStatement.h"
-#include "AST/Statement/WhileStatement.h"
-#include "AST/Statement/ForStatement.h"
-#include "AST/Statement/FunctionStatement.h"
-#include "AST/Statement/ReturnStatement.h"
 #include "AST/Statement/BreakStatement.h"
 #include "AST/Statement/ContinueStatement.h"
+#include "AST/Statement/ForStatement.h"
+#include "AST/Statement/FunctionStatement.h"
+#include "AST/Statement/IfStatement.h"
+#include "AST/Statement/ReturnStatement.h"
+#include "AST/Statement/WhileStatement.h"
 #include "Errors/SyntaxError.h"
+
+#include <stdexcept>
+#include <unordered_set>
 
 void SemanticAnalyzer::analyze(const Statement &program)
 {

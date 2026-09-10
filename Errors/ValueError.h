@@ -5,8 +5,8 @@
 class ValueError : public Error
 {
 public:
-    ValueError(const std::string &message, const SourceLocation &location)
-        : Error("ValueError", message, location)
-    {
-    }
+  ValueError(const std::string &message, const SourceLocation &location)
+      : Error("ValueError", message, location)
+  {
+  }
 };

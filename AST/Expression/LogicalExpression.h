@@ -1,18 +1,19 @@
 #pragma once
 
+#include "AST/Expression/Expression.h"
+#include "Lexer/Token.h"
+#include "Runtime/Environment.h"
+#include "Runtime/Value.h"
+
 #include <memory>
 #include <stdexcept>
-
-#include "AST/Expression/Expression.h"
-#include "AST/Environment.h"
-#include "Token.h"
-#include "Value.h"
 
 class LogicalExpression : public Expression
 {
 public:
     LogicalExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
-        : left(std::move(left)), op(std::move(op)), right(std::move(right)), Expression({op.line, op.column})
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)),
+          Expression({op.line, op.column})
     {
     }
 

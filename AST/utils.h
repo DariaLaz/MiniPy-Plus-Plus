@@ -1,11 +1,11 @@
 #pragma once
 
+#include "Errors/IndexError.h"
+#include "Runtime/Value.h"
+
 #include <memory>
+#include <stdexcept>
 #include <utility>
 #include <vector>
-#include <stdexcept>
 
-#include "Value.h"
-#include "Errors/IndexError.h"
-
-int normalize_int_index(Value index, std::size_t size, const SourceLocation &location);
+int normalize_int_index(Value index, std::size_t size, const SourceLocation& location);

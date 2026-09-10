@@ -1,6 +1,7 @@
 #include "Builtins/IntBuiltin.h"
-#include "Errors/ValueError.h"
+
 #include "Errors/TypeError.h"
+#include "Errors/ValueError.h"
 
 #include <stdexcept>
 

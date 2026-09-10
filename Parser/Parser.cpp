@@ -1,6 +1,4 @@
-#include <stdexcept>
-#include <string>
-#include <utility>
+#include "Parser.h"
 
 #include "AST/Expression/BinaryExpression.h"
 #include "AST/Expression/BoolExpression.h"
@@ -12,15 +10,13 @@
 #include "AST/Statement/ExpressionStatement.h"
 #include "AST/Statement/IfStatement.h"
 #include "AST/Statement/WhileStatement.h"
-#include "Parser.h"
 
-Parser::Parser(
-    const std::vector<Token> &input)
-    : tokens(input),
-      expression_parser(tokens),
-      statement_parser(
-          tokens,
-          expression_parser)
+#include <stdexcept>
+#include <string>
+#include <utility>
+
+Parser::Parser(const std::vector<Token> &input)
+    : tokens(input), expression_parser(tokens), statement_parser(tokens, expression_parser)
 {
 }
 

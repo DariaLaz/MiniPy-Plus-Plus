@@ -1,24 +1,22 @@
 #pragma once
 
-#include <optional>
+#include "Runtime/Environment.h"
 
-#include "AST/Environment.h"
+#include <optional>
 
 class Statement
 {
 public:
-    Statement(SourceLocation location) : location(location)
-    {
-    }
-    virtual ~Statement() = default;
+  Statement(SourceLocation location) : location(location) {}
+  virtual ~Statement() = default;
 
-    virtual std::optional<Value> execute(Environment &env) const = 0;
+  virtual std::optional<Value> execute(Environment &env) const = 0;
 
-    SourceLocation get_location() const
-    {
-        return location;
-    }
+  SourceLocation get_location() const
+  {
+    return location;
+  }
 
 private:
-    SourceLocation location;
+  SourceLocation location;
 };

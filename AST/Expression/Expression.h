@@ -1,14 +1,12 @@
 #pragma once
 
-#include "AST/Environment.h"
-#include <Value.h>
+#include "Runtime/Environment.h"
+#include "Runtime/Value.h"
 
 class Expression
 {
 public:
-    Expression(const SourceLocation &location) : location(location)
-    {
-    }
+    Expression(const SourceLocation &location) : location(location) {}
     virtual ~Expression() noexcept = default;
     virtual Value evaluate(Environment &env) const = 0;
 

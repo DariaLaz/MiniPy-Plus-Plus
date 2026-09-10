@@ -5,8 +5,8 @@
 class IndentationError : public Error
 {
 public:
-    IndentationError(const std::string &message, const SourceLocation &location)
-        : Error("IndentationError", message, location)
-    {
-    }
+  IndentationError(const std::string &message, const SourceLocation &location)
+      : Error("IndentationError", message, location)
+  {
+  }
 };

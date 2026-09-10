@@ -5,8 +5,8 @@
 class TypeError : public Error
 {
 public:
-    TypeError(const std::string &message, const SourceLocation &location)
-        : Error("TypeError", message, location)
-    {
-    }
+  TypeError(const std::string &message, const SourceLocation &location)
+      : Error("TypeError", message, location)
+  {
+  }
 };

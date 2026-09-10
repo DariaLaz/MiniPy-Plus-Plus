@@ -1,6 +1,7 @@
 
-#include "Builtins/Builtin.h"
 #include "Builtins/LenBuiltin.h"
+
+#include "Builtins/Builtin.h"
 #include "Errors/TypeError.h"
 
 std::string LenBuiltin::name() const
@@ -28,8 +29,7 @@ Value LenBuiltin::func(const std::vector<Value> &args, const SourceLocation &loc
         return static_cast<int>(list->elements.size());
     }
 
-    if (std::holds_alternative<
-            std::shared_ptr<DictValue>>(value))
+    if (std::holds_alternative<std::shared_ptr<DictValue>>(value))
     {
         auto dict = std::get<std::shared_ptr<DictValue>>(value);
         return static_cast<int>(dict->elements.size());

@@ -1,12 +1,12 @@
 #pragma once
 
+#include "AST/Expression/Expression.h"
+#include "Runtime/Value.h"
+
 #include <memory>
 #include <stdexcept>
 #include <utility>
 #include <vector>
-
-#include "AST/Expression/Expression.h"
-#include "Value.h"
 
 class DictExpression : public Expression
 {
@@ -26,7 +26,8 @@ public:
         {
             Value key_value = entry.first->evaluate(env);
 
-            validate_alternative<std::string>(key_value, entry.first->get_location(), "Dictionary key must be a string");
+            validate_alternative<std::string>(key_value, entry.first->get_location(),
+                                              "Dictionary key must be a string");
 
             std::string key = std::get<std::string>(key_value);
 

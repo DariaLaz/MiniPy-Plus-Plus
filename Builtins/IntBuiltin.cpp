@@ -38,6 +38,11 @@ Value IntBuiltin::func(const std::vector<Value> &args, const SourceLocation &loc
 
             int result = std::stoi(text, &pos);
 
+            if (pos != text.size())
+            {
+                throw ValueError("Invalid literal for int(): " + text, location);
+            }
+
             return result;
         }
         catch (...)

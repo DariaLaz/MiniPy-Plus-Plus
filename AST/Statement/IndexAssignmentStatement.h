@@ -31,7 +31,7 @@ public:
 
             validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
 
-            int i = normalize_int_index(index_value, list->elements.size());
+            int i = normalize_int_index(index_value, list->elements.size(), get_location());
 
             if (i < 0 || i >= static_cast<int>(list->elements.size()))
             {

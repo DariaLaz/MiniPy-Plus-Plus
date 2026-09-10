@@ -8,4 +8,4 @@
 #include "Value.h"
 #include "Errors/IndexError.h"
 
-int normalize_int_index(Value index, int size);
+int normalize_int_index(Value index, std::size_t size, const SourceLocation &location);

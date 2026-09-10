@@ -27,12 +27,12 @@ std::unique_ptr<Expression> ExpressionParser::primary()
 {
     if (tokens.match(TokenType::Number))
     {
-        return std::make_unique<NumberExpression>(std::stoi(tokens.prev().text), get_location());
+        return std::make_unique<NumberExpression>(std::stoi(tokens.prev().text), get_prev_location());
     }
 
     if (tokens.match(TokenType::Identifier))
     {
-        return std::make_unique<VariableExpression>(tokens.prev().text, get_location());
+        return std::make_unique<VariableExpression>(tokens.prev().text, get_prev_location());
     }
 
     if (tokens.match(TokenType::LeftParen))
@@ -49,12 +49,12 @@ std::unique_ptr<Expression> ExpressionParser::primary()
 
     if (tokens.match(TokenType::True))
     {
-        return std::make_unique<BoolExpression>(true, get_location());
+        return std::make_unique<BoolExpression>(true, get_prev_location());
     }
 
     if (tokens.match(TokenType::False))
     {
-        return std::make_unique<BoolExpression>(false, get_location());
+        return std::make_unique<BoolExpression>(false, get_prev_location());
     }
 
     if (tokens.match(TokenType::LeftBracket))
@@ -64,12 +64,12 @@ std::unique_ptr<Expression> ExpressionParser::primary()
 
     if (tokens.match(TokenType::String))
     {
-        return std::make_unique<StringExpression>(tokens.prev().text, get_location());
+        return std::make_unique<StringExpression>(tokens.prev().text, get_prev_location());
     }
 
     if (tokens.match(TokenType::None))
     {
-        return std::make_unique<NoneExpression>(get_location());
+        return std::make_unique<NoneExpression>(get_prev_location());
     }
 
     if (tokens.match(TokenType::LeftBrace))
@@ -131,7 +131,7 @@ std::unique_ptr<Expression> ExpressionParser::list()
         throw SyntaxError("Expected ']' after list", get_location());
     }
 
-    return std::make_unique<ListExpression>(std::move(elements), get_location());
+    return std::make_unique<ListExpression>(std::move(elements), get_prev_location());
 }
 
 std::unique_ptr<Expression> ExpressionParser::postfix()
@@ -142,6 +142,8 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
     {
         if (tokens.match(TokenType::LeftBracket))
         {
+            SourceLocation location = get_prev_location();
+
             std::unique_ptr<Expression> first = nullptr;
 
             // x[:3]
@@ -165,7 +167,7 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
                     throw SyntaxError("Expected ']' after slice", get_location());
                 }
 
-                expr = std::make_unique<SliceExpression>(std::move(expr), std::move(first), std::move(end), get_location());
+                expr = std::make_unique<SliceExpression>(std::move(expr), std::move(first), std::move(end), location);
             }
 
             else
@@ -180,11 +182,13 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
                     throw SyntaxError("Expected ']' after index", get_location());
                 }
 
-                expr = std::make_unique<IndexExpression>(std::move(expr), std::move(first), get_location());
+                expr = std::make_unique<IndexExpression>(std::move(expr), std::move(first), location);
             }
         }
         else if (tokens.match(TokenType::LeftParen))
         {
+            SourceLocation location = get_prev_location();
+
             std::vector<std::unique_ptr<Expression>> arguments;
 
             if (!tokens.check(TokenType::RightParen))
@@ -200,7 +204,7 @@ std::unique_ptr<Expression> ExpressionParser::postfix()
                 throw SyntaxError("Expected ')' after arguments", get_location());
             }
 
-            expr = std::make_unique<CallExpression>(std::move(expr), std::move(arguments), get_location());
+            expr = std::make_unique<CallExpression>(std::move(expr), std::move(arguments), location);
         }
         else
         {
@@ -219,7 +223,7 @@ std::unique_ptr<Expression> ExpressionParser::unary()
         tokens.increment();
 
         auto val = unary();
-        return std::make_unique<UnaryExpression>(t, std::move(val), get_location());
+        return std::make_unique<UnaryExpression>(t, std::move(val));
     }
 
     return postfix();
@@ -254,7 +258,7 @@ std::unique_ptr<Expression> ExpressionParser::not_expression()
 
         auto right = not_expression();
 
-        return std::make_unique<UnaryExpression>(op, std::move(right), get_location());
+        return std::make_unique<UnaryExpression>(op, std::move(right));
     }
 
     return equality();
@@ -303,4 +307,9 @@ std::unique_ptr<Expression> ExpressionParser::binary_expr(
 SourceLocation ExpressionParser::get_location() const
 {
     return SourceLocation{tokens.current().line, tokens.current().column};
+}
+
+SourceLocation ExpressionParser::get_prev_location() const
+{
+    return SourceLocation{tokens.prev().line, tokens.prev().column};
 }

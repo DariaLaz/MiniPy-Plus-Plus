@@ -1,12 +1,18 @@
 #include "AST/utils.h"
 
-int normalize_int_index(Value index, int size)
+int normalize_int_index(Value index_value, std::size_t size, const SourceLocation &location)
 {
-    int i = std::get<int>(index);
-    if (i < 0)
+    int index = std::get<int>(index_value);
+
+    if (index < 0)
     {
-        i += size;
+        index += static_cast<int>(size);
     }
 
-    return i;
+    if (index < 0 || index >= static_cast<int>(size))
+    {
+        throw IndexError("Index out of range", location);
+    }
+
+    return index;
 }

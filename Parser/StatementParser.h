@@ -28,7 +28,10 @@ private:
 
     std::unique_ptr<Statement> index_assignment();
 
+    bool is_index_assignment();
+
     SourceLocation get_location() const;
+    SourceLocation get_prev_location() const;
 
     TokenStream &tokens;
     ExpressionParser &expressions;

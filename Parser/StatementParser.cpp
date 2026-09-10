@@ -141,6 +141,7 @@ std::unique_ptr<Statement> StatementParser::return_statement()
 
 std::unique_ptr<Statement> StatementParser::simple_statement()
 {
+    // x = expression
     if (tokens.check(TokenType::Identifier) && tokens.check_next(TokenType::Equal))
     {
         std::string name = tokens.current().text;
@@ -152,18 +153,10 @@ std::unique_ptr<Statement> StatementParser::simple_statement()
         return std::make_unique<AssignmentStatement>(name, std::move(value), get_location());
     }
 
-    // list[index] = expression
-    if (tokens.check(TokenType::Identifier) && tokens.check_next(TokenType::LeftBracket))
+    // x[index] = expression
+    if (is_index_assignment())
     {
-        int saved_position = tokens.position();
-
-        auto assignment = index_assignment();
-
-        if (assignment)
-        {
-            return assignment;
-        }
-        tokens.set_position(saved_position);
+        return index_assignment();
     }
 
     return std::make_unique<ExpressionStatement>(expressions.parse(), get_location());
@@ -250,22 +243,25 @@ std::unique_ptr<Statement> StatementParser::statement()
 
     if (tokens.match(TokenType::Break))
     {
+        SourceLocation location = get_prev_location();
         if (!tokens.match(TokenType::Newline))
         {
             throw SyntaxError("Expected newline after break", get_location());
         }
 
-        return std::make_unique<BreakStatement>(get_location());
+        return std::make_unique<BreakStatement>(location);
     }
 
     if (tokens.match(TokenType::Continue))
     {
+        SourceLocation location = get_prev_location();
+
         if (!tokens.match(TokenType::Newline))
         {
             throw SyntaxError("Expected newline after continue", get_location());
         }
 
-        return std::make_unique<ContinueStatement>(get_location());
+        return std::make_unique<ContinueStatement>(location);
     }
 
     auto stmt = simple_statement();
@@ -315,6 +311,40 @@ std::unique_ptr<Statement> StatementParser::block()
     return std::make_unique<BlockStatement>(std::move(statements), get_location());
 }
 
+bool StatementParser::is_index_assignment()
+{
+    if (!tokens.check(TokenType::Identifier) || !tokens.check_next(TokenType::LeftBracket))
+    {
+        return false;
+    }
+
+    int saved_position = tokens.position();
+
+    tokens.increment(2);
+
+    int bracket_depth = 1;
+
+    while (bracket_depth > 0 && !tokens.check(TokenType::End))
+    {
+        if (tokens.check(TokenType::LeftBracket))
+        {
+            bracket_depth++;
+        }
+        else if (tokens.check(TokenType::RightBracket))
+        {
+            bracket_depth--;
+        }
+
+        tokens.increment();
+    }
+
+    bool result = bracket_depth == 0 && tokens.check(TokenType::Equal);
+
+    tokens.set_position(saved_position);
+
+    return result;
+}
+
 std::unique_ptr<Statement> StatementParser::index_assignment()
 {
     std::string name = tokens.current().text;
@@ -323,7 +353,7 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 
     if (!tokens.match(TokenType::LeftBracket))
     {
-        return nullptr;
+        throw SyntaxError("Expected '[' after identifier", get_location());
     }
 
     auto index = expressions.parse();
@@ -335,7 +365,7 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 
     if (!tokens.match(TokenType::Equal))
     {
-        return nullptr;
+        throw SyntaxError("Expected '=' after index", get_location());
     }
 
     auto value = expressions.parse();
@@ -346,4 +376,9 @@ std::unique_ptr<Statement> StatementParser::index_assignment()
 SourceLocation StatementParser::get_location() const
 {
     return SourceLocation{tokens.current().line, tokens.current().column};
+}
+
+SourceLocation StatementParser::get_prev_location() const
+{
+    return SourceLocation{tokens.prev().line, tokens.prev().column};
 }

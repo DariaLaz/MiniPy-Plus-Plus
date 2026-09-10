@@ -1,5 +1,5 @@
 #include "Builtins/StrBuiltin.h"
-#include "Errors/ValueError.h"
+#include "Errors/TypeError.h"
 
 #include <stdexcept>
 
@@ -12,7 +12,7 @@ Value StrBuiltin::func(const std::vector<Value> &args, const SourceLocation &loc
 {
     if (args.size() != 1)
     {
-        throw ValueError("str() expects 1 argument", location);
+        throw TypeError("str() expects 1 argument", location);
     }
 
     return value_to_string(args[0], location);

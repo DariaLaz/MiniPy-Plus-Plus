@@ -32,4 +32,5 @@ private:
     TokenStream &tokens;
 
     SourceLocation get_location() const;
+    SourceLocation get_prev_location() const;
 };

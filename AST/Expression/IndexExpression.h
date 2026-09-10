@@ -6,7 +6,7 @@
 
 #include "AST/Expression/Expression.h"
 #include "AST/utils.h"
-#include "Errors/IndexError.h"
+#include "Errors/TypeError.h"
 #include "Errors/KeyError.h"
 
 class IndexExpression : public Expression
@@ -32,7 +32,7 @@ public:
             auto val = dict->elements.find(key);
             if (val == dict->elements.end())
             {
-                throw KeyError("Dictionary key not found: " + key, get_location());
+                throw KeyError("Dictionary key not found: " + key, index->get_location());
             }
 
             return val->second;
@@ -44,7 +44,7 @@ public:
 
             validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
 
-            int i = normalize_int_index(index_value, list->elements.size());
+            int i = normalize_int_index(index_value, list->elements.size(), get_location());
 
             return list->elements[i];
         }
@@ -55,12 +55,12 @@ public:
 
             validate_alternative<int>(index_value, index->get_location(), "Index must be an integer");
 
-            int i = normalize_int_index(index_value, str.size());
+            int i = normalize_int_index(index_value, str.size(), get_location());
 
             return std::string(1, str[i]);
         }
 
-        throw IndexError("Object is not indexable", get_location());
+        throw TypeError("Object is not indexable", get_location());
     }
 
 private:

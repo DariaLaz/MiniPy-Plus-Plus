@@ -12,8 +12,8 @@ public:
     Token op;
     std::unique_ptr<Expression> expr;
 
-    UnaryExpression(Token op, std::unique_ptr<Expression> expr, const SourceLocation &location)
-        : op(std::move(op)), expr(std::move(expr)), Expression(location)
+    UnaryExpression(Token op, std::unique_ptr<Expression> expr)
+        : op(std::move(op)), expr(std::move(expr)), Expression({op.line, op.column})
     {
     }
 
@@ -24,6 +24,7 @@ public:
         switch (op.type)
         {
         case TokenType::Minus:
+            validate_alternative<int>(value, get_location(), "Bad operand type for unary for '" + op.text + "'");
             return -std::get<int>(value);
 
         case TokenType::Plus:

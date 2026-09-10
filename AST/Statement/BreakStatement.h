@@ -8,7 +8,7 @@ class BreakStatement : public Statement
 public:
   BreakStatement(SourceLocation location) : Statement(location) {}
 
-  std::optional<Value> execute(Environment &env) const override
+  std::optional<Value> execute(Environment &) const override
   {
     throw BreakSignal{};
   }

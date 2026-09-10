@@ -12,7 +12,7 @@ class ReturnStatement : public Statement
 {
 public:
     ReturnStatement(std::unique_ptr<Expression> value, SourceLocation location)
-        : value(std::move(value)), Statement(location)
+        : Statement(location), value(std::move(value))
     {
     }
 

@@ -10,7 +10,7 @@ class AssignmentStatement : public Statement
 public:
   AssignmentStatement(std::string name, std::unique_ptr<Expression> value,
                       SourceLocation location)
-      : name(std::move(name)), value(std::move(value)), Statement(location)
+      : Statement(location), name(std::move(name)), value(std::move(value))
   {
   }
 

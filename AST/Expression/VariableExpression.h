@@ -8,7 +8,7 @@ public:
     std::string name;
 
     VariableExpression(std::string name, const SourceLocation &location)
-        : name(std::move(name)), Expression(location)
+        : Expression(location), name(std::move(name))
     {
     }
 

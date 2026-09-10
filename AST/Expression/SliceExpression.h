@@ -13,8 +13,7 @@ class SliceExpression : public Expression
 public:
     SliceExpression(std::unique_ptr<Expression> object, std::unique_ptr<Expression> start,
                     std::unique_ptr<Expression> end, const SourceLocation &location)
-        : object(std::move(object)), start(std::move(start)), end(std::move(end)),
-          Expression(location)
+        : Expression(location), object(std::move(object)), start(std::move(start)), end(std::move(end))
     {
     }
 

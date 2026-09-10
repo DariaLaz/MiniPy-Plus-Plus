@@ -14,8 +14,7 @@ class ForStatement : public Statement
 public:
     ForStatement(std::string variable, std::unique_ptr<Expression> iterable,
                  std::unique_ptr<Statement> body, SourceLocation location)
-        : variable(std::move(variable)), iterable(std::move(iterable)), body(std::move(body)),
-          Statement(location)
+        : Statement(location), variable(std::move(variable)), iterable(std::move(iterable)), body(std::move(body))
     {
     }
 

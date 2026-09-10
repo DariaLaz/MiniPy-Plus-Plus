@@ -14,7 +14,7 @@ class WhileStatement : public Statement
 public:
     WhileStatement(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> body,
                    SourceLocation location)
-        : condition(std::move(condition)), body(std::move(body)), Statement(location)
+        : Statement(location), condition(std::move(condition)), body(std::move(body))
     {
     }
 

@@ -18,7 +18,7 @@ public:
 
 private:
   std::string source;
-  int curr = 0;
+  std::size_t curr = 0;
   int grouping_depth = 0;
 
   int line = 1;
